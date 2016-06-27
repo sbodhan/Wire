@@ -6,6 +6,10 @@ target 'Wire' do
   # use_frameworks!
 
   # Pods for Wire
-pod 'JSQMessagesViewController'
+	pod 'JSQMessagesViewController'
+	pod 'Firebase'
+	pod 'Firebase/Auth'
+	pod 'Firebase/Database'
+	pod 'Firebase/Storage'
 
 end
