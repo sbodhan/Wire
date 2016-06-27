@@ -15,6 +15,7 @@
 		B8E3BAD71D2175640019E384 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B8E3BAD61D2175640019E384 /* Assets.xcassets */; };
 		B8E3BADA1D2175640019E384 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B8E3BAD81D2175640019E384 /* LaunchScreen.storyboard */; };
 		B8E3BAE21D21758B0019E384 /* .gitignore in Resources */ = {isa = PBXBuildFile; fileRef = B8E3BAE11D21758B0019E384 /* .gitignore */; };
+		B8E3BAE41D219D1C0019E384 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = B8E3BAE31D219D1C0019E384 /* GoogleService-Info.plist */; };
 		C620D6B81D21963000E607B3 /* podfile in Resources */ = {isa = PBXBuildFile; fileRef = C620D6B71D21963000E607B3 /* podfile */; };
 /* End PBXBuildFile section */
 
@@ -31,6 +32,7 @@
 		B8E3BAD91D2175640019E384 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		B8E3BADB1D2175640019E384 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B8E3BAE11D21758B0019E384 /* .gitignore */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
+		B8E3BAE31D219D1C0019E384 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		C620D6B71D21963000E607B3 /* podfile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = podfile; sourceTree = "<group>"; };
 		CA1D7627BD91BC7373C760B4 /* Pods-Wire.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Wire.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Wire/Pods-Wire.debug.xcconfig"; sourceTree = "<group>"; };
 		E0D5DADFF0B2E435104D363C /* Pods-Wire.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Wire.release.xcconfig"; path = "Pods/Target Support Files/Pods-Wire/Pods-Wire.release.xcconfig"; sourceTree = "<group>"; };
@@ -88,6 +90,7 @@
 				B8E3BAD61D2175640019E384 /* Assets.xcassets */,
 				B8E3BAD81D2175640019E384 /* LaunchScreen.storyboard */,
 				B8E3BADB1D2175640019E384 /* Info.plist */,
+				B8E3BAE31D219D1C0019E384 /* GoogleService-Info.plist */,
 				B8E3BACA1D2175640019E384 /* Supporting Files */,
 			);
 			path = Wire;
@@ -174,6 +177,7 @@
 				C620D6B81D21963000E607B3 /* podfile in Resources */,
 				B8E3BAD71D2175640019E384 /* Assets.xcassets in Resources */,
 				B8E3BAD51D2175640019E384 /* Main.storyboard in Resources */,
+				B8E3BAE41D219D1C0019E384 /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
