@@ -7,8 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "UserProfile.h"
 
-@interface ChatDirectoryTableViewController : UIViewController
+@interface ChatDirectoryTableViewController : UITableViewController
 
 @end

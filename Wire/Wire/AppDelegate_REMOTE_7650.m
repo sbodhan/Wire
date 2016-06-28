@@ -27,7 +27,7 @@
     [[FIRAuth auth] addAuthStateDidChangeListener:^(FIRAuth *auth,
                                                     FIRUser *user) {
         //CHANGE THIS BACK TO != nil
-        if (user != nil) {
+        if (user == nil) {
 
             // Show the Initial ChatDirectoryNavController
             self.window.rootViewController = [storyboard instantiateViewControllerWithIdentifier:@"ChatDirectoryNavController"];

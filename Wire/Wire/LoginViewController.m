@@ -7,6 +7,7 @@
 //
 
 #import "LoginViewController.h"
+@import Firebase;
 
 @interface LoginViewController ()
 @property (weak, nonatomic) IBOutlet UITextField *emailTF;
@@ -27,6 +28,13 @@
 }
 
 - (IBAction)loginButtonPressed:(id)sender {
+    NSLog(@"Login Pressed");
+    [[FIRAuth auth] signInWithEmail:@"email2@gmail.com"
+                           password:@"password"
+                         completion:^(FIRUser *user, NSError *error) {
+                             NSLog(@"%@ %@", user, error);
+                             // ...
+                         }];
     
 }
 

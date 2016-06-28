@@ -18,9 +18,9 @@
 
 - (void)viewDidLoad {
     [self setValuesToDatabase];
+
     [super viewDidLoad];
   
-  //ref = [[FIRDatabase database] reference];
     
 }
 
@@ -62,8 +62,6 @@
 //    }
 //    
 //}
-
-
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"ChatDirectoryCell" forIndexPath:indexPath];
