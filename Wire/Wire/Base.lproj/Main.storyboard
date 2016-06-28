@@ -50,7 +50,7 @@
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="No Account?" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="X0e-iM-RVd">
                                 <rect key="frame" x="111" y="288" width="98" height="21"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                 <nil key="highlightedColor"/>
                             </label>
                         </subviews>
@@ -65,6 +65,55 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="90V-dC-LCU" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="553" y="302"/>
+        </scene>
+        <!--Chat Directory Table View Controller-->
+        <scene sceneID="TXl-hk-RJp">
+            <objects>
+                <viewController id="QLi-6n-Ams" customClass="ChatDirectoryTableViewController" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="PlA-rB-eWb"/>
+                        <viewControllerLayoutGuide type="bottom" id="WJ8-UW-fAq"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="Z9q-HY-NE8">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="71" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="Adu-b2-1Dt">
+                                <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <prototypes>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" accessoryType="disclosureIndicator" indentationWidth="10" reuseIdentifier="ChatDirectoryCell" rowHeight="71" id="caH-qZ-PY1">
+                                        <rect key="frame" x="0.0" y="92" width="320" height="71"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="caH-qZ-PY1" id="EtD-IC-9VR">
+                                            <rect key="frame" x="0.0" y="0.0" width="287" height="71"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                        </tableViewCellContentView>
+                                        <color key="backgroundColor" red="0.0" green="1" blue="0.50196081400000003" alpha="1" colorSpace="calibratedRGB"/>
+                                        <connections>
+                                            <segue destination="i5Z-ep-M6M" kind="push" id="WJm-n5-T2N"/>
+                                        </connections>
+                                    </tableViewCell>
+                                </prototypes>
+                                <connections>
+                                    <outlet property="dataSource" destination="QLi-6n-Ams" id="clz-Gx-uP5"/>
+                                    <outlet property="delegate" destination="QLi-6n-Ams" id="nQq-2f-Epf"/>
+                                </connections>
+                            </tableView>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="Adu-b2-1Dt" firstAttribute="leading" secondItem="Z9q-HY-NE8" secondAttribute="leading" id="GNN-ZB-SCW"/>
+                            <constraint firstItem="Adu-b2-1Dt" firstAttribute="top" secondItem="Z9q-HY-NE8" secondAttribute="top" id="UBD-gP-esq"/>
+                            <constraint firstItem="Adu-b2-1Dt" firstAttribute="bottom" secondItem="WJ8-UW-fAq" secondAttribute="top" id="gER-Aq-ZZO"/>
+                            <constraint firstAttribute="trailing" secondItem="Adu-b2-1Dt" secondAttribute="trailing" id="q9U-eJ-3yj"/>
+                        </constraints>
+                    </view>
+                    <navigationItem key="navigationItem" id="rYw-LY-0kZ"/>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="3Ee-eC-xhb" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="949" y="945"/>
         </scene>
         <!--Chat View Controller-->
         <scene sceneID="2mj-ze-zcm">
@@ -83,7 +132,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="uvg-6W-aKf" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1308" y="947"/>
+            <point key="canvasLocation" x="1354" y="947"/>
         </scene>
         <!--Sign Up View Controller-->
         <scene sceneID="Zew-lO-Leq">
@@ -140,7 +189,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="5YY-u4-e5K" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="916" y="296"/>
+            <point key="canvasLocation" x="938" y="302"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="bc4-26-D6y">
@@ -171,44 +220,12 @@
                     </navigationBar>
                     <nil name="viewControllers"/>
                     <connections>
-                        <segue destination="X6t-yD-wfM" kind="relationship" relationship="rootViewController" id="NEx-9X-rpK"/>
+                        <segue destination="QLi-6n-Ams" kind="relationship" relationship="rootViewController" id="fmd-Tx-QnM"/>
                     </connections>
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="0hO-tn-5Ed" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="548" y="947"/>
-        </scene>
-        <!--Chat Directory Table View Controller-->
-        <scene sceneID="7fo-8V-fRZ">
-            <objects>
-                <tableViewController id="X6t-yD-wfM" customClass="ChatDirectoryTableViewController" sceneMemberID="viewController">
-                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="110" sectionHeaderHeight="28" sectionFooterHeight="28" id="H1d-cG-4Zh">
-                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                        <prototypes>
-                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" accessoryType="disclosureIndicator" indentationWidth="10" reuseIdentifier="ChatDirectoryCell" rowHeight="110" id="cgc-ZG-lk2">
-                                <rect key="frame" x="0.0" y="92" width="320" height="110"/>
-                                <autoresizingMask key="autoresizingMask"/>
-                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="cgc-ZG-lk2" id="gPd-3s-Utj">
-                                    <rect key="frame" x="0.0" y="0.0" width="287" height="109.5"/>
-                                    <autoresizingMask key="autoresizingMask"/>
-                                </tableViewCellContentView>
-                                <connections>
-                                    <segue destination="i5Z-ep-M6M" kind="push" id="WPC-Wu-asq"/>
-                                </connections>
-                            </tableViewCell>
-                        </prototypes>
-                        <connections>
-                            <outlet property="dataSource" destination="X6t-yD-wfM" id="eOE-Ed-Qu8"/>
-                            <outlet property="delegate" destination="X6t-yD-wfM" id="HeN-jw-tqc"/>
-                        </connections>
-                    </tableView>
-                    <navigationItem key="navigationItem" id="2SG-JF-fgk"/>
-                </tableViewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="3Tx-64-1Mq" userLabel="First Responder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="933" y="947"/>
         </scene>
     </scenes>
 </document>
