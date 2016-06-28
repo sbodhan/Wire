@@ -16,10 +16,6 @@
 
 @implementation AppDelegate
 
-
-//LoginNavController
-//ChatDirectoryNavController
-
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
     
@@ -30,10 +26,8 @@
     
     [[FIRAuth auth] addAuthStateDidChangeListener:^(FIRAuth *auth,
                                                     FIRUser *user) {
-        
-        if (user != nil) {
-            NSLog(@"USER: %@", user.description);
-            NSLog(@"USER ID: %@", user.uid);
+        //CHANGE THIS BACK TO != nil
+        if (user == nil) {
 
             // Show the Initial ChatDirectoryNavController
             self.window.rootViewController = [storyboard instantiateViewControllerWithIdentifier:@"ChatDirectoryNavController"];
