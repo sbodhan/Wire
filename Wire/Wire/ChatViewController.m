@@ -7,31 +7,45 @@
 //
 
 #import "ChatViewController.h"
+@import FirebaseDatabase;
 
 @interface ChatViewController ()
-
+@property (nonatomic, strong) NSMutableArray *messages;
 @end
 
 @implementation ChatViewController
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    // Do any additional setup after loading the view.
+    
+    //THESE ARE ONLY FOR TESTING SO APP WON'T CRASH!
+    self.senderId = @"3252646";
+    self.senderDisplayName = @"user1";
+    
 }
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
 }
 
-/*
-#pragma mark - Navigation
-
-// In a storyboard-based application, you will often want to do a little preparation before navigation
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    // Get the new view controller using [segue destinationViewController].
-    // Pass the selected object to the new view controller.
+//Send Button Pressed.
+-(void)didPressSendButton:(UIButton *)button withMessageText:(NSString *)text senderId:(NSString *)senderId senderDisplayName:(NSString *)senderDisplayName date:(NSDate *)date {
+   
+    NSString *timestamp = [NSString stringWithFormat:@"%@", date];
+    NSDictionary *message = @{@"text": text, @"senderId": senderId, @"senderName": senderDisplayName, @"timestamp":timestamp};
+    [self sendMessageToFirebase:message];
 }
-*/
+
+//Number of items in section
+-(NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
+    return [_messages count];
+}
+
+#pragma mark Firebase Methods
+
+-(void)sendMessageToFirebase:(NSDictionary *)message {
+    FIRDatabaseReference *messagesRef = [[[[FIRDatabase database]reference]child:@"messages"]childByAutoId];
+    [messagesRef setValue:message];
+}
 
 @end

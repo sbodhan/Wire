@@ -29,7 +29,7 @@
 
 - (IBAction)loginButtonPressed:(id)sender {
     NSLog(@"Login Pressed");
-    [[FIRAuth auth] signInWithEmail:@"email@gmail.com"
+    [[FIRAuth auth] signInWithEmail:@"email2@gmail.com"
                            password:@"password"
                          completion:^(FIRUser *user, NSError *error) {
                              NSLog(@"%@ %@", user, error);
