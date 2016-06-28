@@ -19,7 +19,8 @@
 		B8E3BADA1D2175640019E384 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B8E3BAD81D2175640019E384 /* LaunchScreen.storyboard */; };
 		B8E3BAE21D21758B0019E384 /* .gitignore in Resources */ = {isa = PBXBuildFile; fileRef = B8E3BAE11D21758B0019E384 /* .gitignore */; };
 		B8E3BAE41D219D1C0019E384 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = B8E3BAE31D219D1C0019E384 /* GoogleService-Info.plist */; };
-		C620D6B81D21963000E607B3 /* podfile in Resources */ = {isa = PBXBuildFile; fileRef = C620D6B71D21963000E607B3 /* podfile */; };
+		C620D6E71D22B75600E607B3 /* UserProfile.m in Sources */ = {isa = PBXBuildFile; fileRef = C620D6E61D22B75600E607B3 /* UserProfile.m */; };
+		C620D6EB1D22B99000E607B3 /* Message.m in Sources */ = {isa = PBXBuildFile; fileRef = C620D6EA1D22B99000E607B3 /* Message.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -42,7 +43,10 @@
 		B8E3BADB1D2175640019E384 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B8E3BAE11D21758B0019E384 /* .gitignore */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
 		B8E3BAE31D219D1C0019E384 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
-		C620D6B71D21963000E607B3 /* podfile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = podfile; sourceTree = "<group>"; };
+		C620D6E51D22B75600E607B3 /* UserProfile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UserProfile.h; sourceTree = "<group>"; };
+		C620D6E61D22B75600E607B3 /* UserProfile.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UserProfile.m; sourceTree = "<group>"; };
+		C620D6E91D22B99000E607B3 /* Message.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Message.h; sourceTree = "<group>"; };
+		C620D6EA1D22B99000E607B3 /* Message.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Message.m; sourceTree = "<group>"; };
 		CA1D7627BD91BC7373C760B4 /* Pods-Wire.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Wire.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Wire/Pods-Wire.debug.xcconfig"; sourceTree = "<group>"; };
 		E0D5DADFF0B2E435104D363C /* Pods-Wire.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Wire.release.xcconfig"; path = "Pods/Target Support Files/Pods-Wire/Pods-Wire.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -72,6 +76,7 @@
 			isa = PBXGroup;
 			children = (
 				B8E3BAE11D21758B0019E384 /* .gitignore */,
+				C620D6E81D22B75B00E607B3 /* Models */,
 				B8E3BAC91D2175640019E384 /* Wire */,
 				B8E3BAC81D2175640019E384 /* Products */,
 				5D35BE062306DB60D9D390DF /* Pods */,
@@ -90,7 +95,6 @@
 		B8E3BAC91D2175640019E384 /* Wire */ = {
 			isa = PBXGroup;
 			children = (
-				C620D6B71D21963000E607B3 /* podfile */,
 				B8E3BACD1D2175640019E384 /* AppDelegate.h */,
 				B8E3BACE1D2175640019E384 /* AppDelegate.m */,
 				434D706B1D21A069002DEA46 /* LoginViewController.h */,
@@ -117,6 +121,17 @@
 				B8E3BACB1D2175640019E384 /* main.m */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		C620D6E81D22B75B00E607B3 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				C620D6E51D22B75600E607B3 /* UserProfile.h */,
+				C620D6E61D22B75600E607B3 /* UserProfile.m */,
+				C620D6E91D22B99000E607B3 /* Message.h */,
+				C620D6EA1D22B99000E607B3 /* Message.m */,
+			);
+			name = Models;
 			sourceTree = "<group>";
 		};
 		DA49124278D644A705844889 /* Frameworks */ = {
@@ -189,7 +204,6 @@
 			files = (
 				B8E3BAE21D21758B0019E384 /* .gitignore in Resources */,
 				B8E3BADA1D2175640019E384 /* LaunchScreen.storyboard in Resources */,
-				C620D6B81D21963000E607B3 /* podfile in Resources */,
 				B8E3BAD71D2175640019E384 /* Assets.xcassets in Resources */,
 				B8E3BAD51D2175640019E384 /* Main.storyboard in Resources */,
 				B8E3BAE41D219D1C0019E384 /* GoogleService-Info.plist in Resources */,
@@ -252,9 +266,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				434D706D1D21A069002DEA46 /* LoginViewController.m in Sources */,
+				C620D6EB1D22B99000E607B3 /* Message.m in Sources */,
 				434D70701D21B0AA002DEA46 /* SignUpViewController.m in Sources */,
 				434D70761D21B2E4002DEA46 /* ChatViewController.m in Sources */,
 				B8E3BACF1D2175640019E384 /* AppDelegate.m in Sources */,
+				C620D6E71D22B75600E607B3 /* UserProfile.m in Sources */,
 				B8E3BACC1D2175640019E384 /* main.m in Sources */,
 				434D70731D21B2B5002DEA46 /* ChatDirectoryTableViewController.m in Sources */,
 			);
