@@ -8,6 +8,7 @@
 
 #import "AppDelegate.h"
 @import Firebase;
+@import FirebaseAuth;
 
 @interface AppDelegate ()
 
@@ -16,9 +17,33 @@
 @implementation AppDelegate
 
 
+//LoginNavController
+//ChatDirectoryNavController
+
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
+    
+    self.window = [[UIWindow alloc] initWithFrame:UIScreen.mainScreen.bounds];
+    UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
+    
     [FIRApp configure];
+    
+    [[FIRAuth auth] addAuthStateDidChangeListener:^(FIRAuth *auth,
+                                                    FIRUser *user) {
+        
+        if (user != nil) {
+            NSLog(@"USER: %@", user.description);
+            NSLog(@"USER ID: %@", user.uid);
+
+            // Show the Initial ChatDirectoryNavController
+            self.window.rootViewController = [storyboard instantiateViewControllerWithIdentifier:@"ChatDirectoryNavController"];
+        } else {
+            // Login
+            self.window.rootViewController = [storyboard instantiateViewControllerWithIdentifier:@"LoginNavController"];
+        }
+        [self.window makeKeyAndVisible];
+    }];
+    
     return YES;
 }
 
