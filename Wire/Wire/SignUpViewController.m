@@ -7,6 +7,7 @@
 //
 
 #import "SignUpViewController.h"
+@import Firebase;
 
 @interface SignUpViewController ()
 @property (weak, nonatomic) IBOutlet UITextField *emailTF;
@@ -29,7 +30,15 @@
 }
 
 - (IBAction)signUpButtonPressed:(id)sender {
-
+    NSLog(@"SignUp Clicked");
+    [[FIRAuth auth]
+     createUserWithEmail:@"email@gmail.com"
+     password:@"password"
+     completion:^(FIRUser *_Nullable user,
+                  NSError *_Nullable error) {
+         NSLog(@"%@ %@", user, error );
+         // ...
+     }];
 }
 
 

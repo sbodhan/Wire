@@ -7,7 +7,9 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "UserProfile.h"
 
 @interface ChatDirectoryTableViewController : UITableViewController
+//@property (strong, nonatomic) FIRDatabaseReference *ref;
 
 @end

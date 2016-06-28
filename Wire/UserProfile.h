@@ -12,5 +12,6 @@
 @property (strong, nonatomic) NSString *email;
 @property (strong, nonatomic) NSString *username;
 @property (strong, nonatomic) NSString *uid;
+@property (strong, nonatomic) NSMutableArray *userProfileArray;
 -(instancetype)initUserProfile:(NSString *)email :(NSString *)username :(NSString *)uid;
 @end
