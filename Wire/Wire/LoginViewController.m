@@ -12,6 +12,7 @@
 @interface LoginViewController ()
 @property (weak, nonatomic) IBOutlet UITextField *emailTF;
 @property (weak, nonatomic) IBOutlet UITextField *passwordTF;
+@property (weak, nonatomic) IBOutlet UILabel *invalidErrorMesg;
 
 @end
 
@@ -28,12 +29,28 @@
 }
 
 - (IBAction)loginButtonPressed:(id)sender {
-    NSLog(@"Login Pressed");
-    [[FIRAuth auth] signInWithEmail:@"email2@gmail.com"
-                           password:@"password"
+//    NSLog(@"Login Pressed");
+    [[FIRAuth auth] signInWithEmail:_emailTF.text
+                           password:_passwordTF.text
                          completion:^(FIRUser *user, NSError *error) {
                              NSLog(@"%@ %@", user, error);
                              // ...
+                             
+                             if (error) {
+                                 
+                                 NSString *message=@"Invalid email or password";
+                                 NSString *alertTitle=@"Invalid!";
+                                 NSString *OKText=@"OK";
+                                 
+                                 UIAlertController *alertView = [UIAlertController alertControllerWithTitle:alertTitle message:message preferredStyle:UIAlertControllerStyleAlert];
+                                 UIAlertAction *alertAction = [UIAlertAction actionWithTitle:OKText style:UIAlertActionStyleCancel handler:nil];
+                                 [alertView addAction:alertAction];
+                                 [self presentViewController:alertView animated:YES completion:nil];
+                                
+                        
+                                 
+                             }
+                            
                          }];
     
 }
