@@ -71,6 +71,16 @@
     
     return cell;
 }
+- (IBAction)signOutBtnPressed:(id)sender {
+    NSError *error;
+    [[FIRAuth auth] signOut:&error];
+    if (!error) {
+        // Sign-out succeeded
+    }
+}
+
+
+
 
 /*
 // Override to support conditional editing of the table view.
