@@ -8,7 +8,10 @@
 
 #import <UIKit/UIKit.h>
 #import "JSQMessagesViewController.h"
+#import "UserProfile.h"
 
 @interface ChatViewController : JSQMessagesViewController
+
+@property(strong, nonatomic) UserProfile *currentUserProfile;
 
 @end
