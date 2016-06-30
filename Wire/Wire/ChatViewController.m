@@ -26,14 +26,17 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    
+    [self retrieveUsersInChatRoom];
+    
     [self retrieveMessagesFromFirebase];
     [self JSQMessageBubbleSetup];
     _messages = [[NSMutableArray alloc]init];
     _avatars = [[NSMutableArray alloc]init];
 
     //THESE ARE ONLY FOR TESTING SO APP WON'T CRASH!
-    self.senderId = @"325222222";
-    self.senderDisplayName = @"user1";
+    self.senderId = _currentUserProfile.uid;
+    self.senderDisplayName = _currentUserProfile.username;
     
 }
 
@@ -43,6 +46,7 @@
 
 #pragma mark JSQMessagesViewController Required Protocols.
 //Send Button Pressed.
+
 -(void)didPressSendButton:(UIButton *)button withMessageText:(NSString *)text senderId:(NSString *)senderId senderDisplayName:(NSString *)senderDisplayName date:(NSDate *)date {
     
     NSString *timestamp = [NSString stringWithFormat:@"%@", date];
@@ -81,6 +85,8 @@
     JSQMessagesAvatarImage *avatar = [JSQMessagesAvatarImage avatarWithImage:avatarImage];
     [_avatars addObject:avatar];
     
+    //return nil if you want to override this and have no avatarImage.
+    
     return avatar;
 }
 
@@ -96,7 +102,6 @@
 -(void)sendMessageToFirebase:(NSDictionary *)message {
     FIRDatabaseReference *messagesRef = [[[[FIRDatabase database]reference]child:@"messages"]childByAutoId];
     [messagesRef setValue:message];
-    
 }
 
 -(void)retrieveMessagesFromFirebase {
@@ -110,6 +115,17 @@
          
         [self.collectionView reloadData];
     }];
+}
+
+-(void)retrieveUsersInChatRoom{
+
+    FIRDatabaseReference *userprofileRef = [[[FIRDatabase database]reference]child:@"userprofile"];
+//    FIRDatabaseQuery *usersInChatRoomQuery = [[userprofileRef queryOrderedByChild:@"userId"] queryEqualToValue:[FIRAuth auth].currentUser.uid];
+    [userprofileRef observeEventType:FIRDataEventTypeChildAdded withBlock:^(FIRDataSnapshot *snapshot) {
+        NSLog(@"Snapshot: %@", snapshot.value);
+    }];
+    
+
 }
 
 @end
