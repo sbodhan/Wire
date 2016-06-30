@@ -25,13 +25,14 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    [self retrieveMessagesFromFirebase];
     [self JSQMessageBubbleSetup];
     _messages = [[NSMutableArray alloc]init];
     _avatars = [[NSMutableArray alloc]init];
 
     
     //THESE ARE ONLY FOR TESTING SO APP WON'T CRASH!
-    self.senderId = @"3252646";
+    self.senderId = @"325222222";
     self.senderDisplayName = @"user1";
     
 }
@@ -46,12 +47,6 @@
     NSString *timestamp = [NSString stringWithFormat:@"%@", date];
     NSDictionary *message = @{@"text": text, @"senderId": senderId, @"senderName": senderDisplayName, @"timestamp":timestamp};
     [self sendMessageToFirebase:message];
-    
-    //ONLY FOR TESTING PURPOSES: *****************************************
-    JSQMessage *mssg = [[JSQMessage alloc]initWithSenderId:senderId senderDisplayName:senderDisplayName date:date text:text];
-    [_messages addObject:mssg];
-    [self.collectionView reloadData];
-    //ONLY FOR TESTING PURPOSES: *****************************************
     
 }
 
@@ -100,6 +95,17 @@
     FIRDatabaseReference *messagesRef = [[[[FIRDatabase database]reference]child:@"messages"]childByAutoId];
     [messagesRef setValue:message];
     
+}
+
+-(void)retrieveMessagesFromFirebase {
+    FIRDatabaseReference *messagesRef = [[[FIRDatabase database]reference]child:@"messages"];
+    [messagesRef observeEventType:FIRDataEventTypeChildAdded withBlock:^(FIRDataSnapshot *snapshot) {
+        NSLog(@"SNAPSHOT: %@", snapshot.value);
+        JSQMessage *message = [[JSQMessage alloc]initWithSenderId:snapshot.value[@"senderId"] senderDisplayName:snapshot.value[@"senderName"] date:snapshot.value[@"timestamp"] text:snapshot.value[@"text"]];
+        NSLog(@"Message From Firebase: %@", message.description);
+        [_messages addObject:message];
+        [self.collectionView reloadData];
+    }];
 }
 
 @end
