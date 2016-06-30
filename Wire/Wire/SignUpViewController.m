@@ -7,7 +7,9 @@
 //
 
 #import "SignUpViewController.h"
+#import "UserProfile.h"
 @import Firebase;
+@import FirebaseAuth;
 
 @interface SignUpViewController ()
 @property (weak, nonatomic) IBOutlet UITextField *emailTF;
@@ -56,6 +58,8 @@ NSString *newRepeatPwd;
          completion:^(FIRUser *_Nullable user,
                   NSError *_Nullable error) {
          
+             [self createUserProfileOnFirebase];
+             
              if(error.code == 17007){
              _invalidEntry.hidden = false;
              _invalidEntry.text = @"Email already in use";
@@ -71,5 +75,15 @@ NSString *newRepeatPwd;
          }];
     }
 }
+
+-(void)createUserProfileOnFirebase {
+    if ([FIRAuth auth].currentUser != nil) {
+        FIRDatabaseReference *currentUserProfileRef = [[[[FIRDatabase database]reference]child:@"userprofile"]childByAutoId];
+        UserProfile *newUserProfile = [[UserProfile alloc]initUserProfileWithEmail:_emailTF.text username:_usernameTF.text uid:[FIRAuth auth].currentUser.uid];
+        NSDictionary *newUserProfileDict = @{@"email": newUserProfile.email, @"username": newUserProfile.username, @"userId": newUserProfile.uid, @"profilePhotoDownloadURL": newUserProfile.profileImageDownloadURL};
+        [currentUserProfileRef setValue:newUserProfileDict];
+    }
+}
+
 
 @end
