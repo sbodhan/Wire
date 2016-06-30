@@ -20,24 +20,24 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    // Do any additional setup after loading the view.
 }
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
 }
 
 - (IBAction)loginButtonPressed:(id)sender {
-//    NSLog(@"Login Pressed");
+    [self loginUserToFirebase];
+}
+
+-(void)loginUserToFirebase{
+    NSString *newPwd = [_passwordTF.text stringByReplacingOccurrencesOfString:@" " withString:@""];
+    
     [[FIRAuth auth] signInWithEmail:_emailTF.text
-                           password:_passwordTF.text
+                           password:newPwd
                          completion:^(FIRUser *user, NSError *error) {
-                             NSLog(@"%@ %@", user, error);
-                             // ...
                              
                              if (error) {
-                                 
                                  NSString *message=@"Invalid email or password";
                                  NSString *alertTitle=@"Invalid!";
                                  NSString *OKText=@"OK";
@@ -46,15 +46,10 @@
                                  UIAlertAction *alertAction = [UIAlertAction actionWithTitle:OKText style:UIAlertActionStyleCancel handler:nil];
                                  [alertView addAction:alertAction];
                                  [self presentViewController:alertView animated:YES completion:nil];
-                                
-                        
-                                 
                              }
-                            
+                             
                          }];
-    
 }
-
 
 
 @end

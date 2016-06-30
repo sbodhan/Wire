@@ -17,7 +17,6 @@
 @implementation AppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    // Override point for customization after application launch.
     
     self.window = [[UIWindow alloc] initWithFrame:UIScreen.mainScreen.bounds];
     UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
@@ -26,7 +25,7 @@
     
     [[FIRAuth auth] addAuthStateDidChangeListener:^(FIRAuth *auth,
                                                     FIRUser *user) {
-        //CHANGE THIS BACK TO != nil
+
         if (user != nil) {
 
             // Show the Initial ChatDirectoryNavController
