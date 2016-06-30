@@ -7,6 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import <UIKit/UIKit.h>
 
 @interface UserProfile : NSObject
 @property (strong, nonatomic) NSString *email;
@@ -14,6 +15,7 @@
 @property (strong, nonatomic) NSString *uid;
 @property (strong, nonatomic) NSMutableArray *userProfileArray;
 @property (strong, nonatomic) NSString *profileImageDownloadURL;
+@property (strong, nonatomic) UIImage *profileImage;
 
 -(instancetype)initUserProfileWithEmail:(NSString *)email username:(NSString *)username uid:(NSString *)uid;
 

@@ -7,17 +7,20 @@
 //
 
 #import "ChatDirectoryTableViewController.h"
+#import "UserProfile.h"
 @import FirebaseDatabase;
 @import Firebase;
 
 @interface ChatDirectoryTableViewController () <UITableViewDelegate, UITableViewDataSource>
+
+@property(strong, nonatomic) UserProfile *currentUser;
 
 @end
 
 @implementation ChatDirectoryTableViewController
 
 - (void)viewDidLoad {
-   // [self setValuesToDatabase];
+    [self getCurrentUserProfileFromFirebase];
     [super viewDidLoad];
 }
 
@@ -30,17 +33,6 @@
     return 1;
 }
 
-
--(void)setValuesToDatabase{
-    UserProfile *newUserProfile = [[UserProfile alloc]init];
-    newUserProfile.username = @"Sarmila";
-    newUserProfile.email = @"something@hotmail.com";
-    NSDictionary *newUserProfileInfo = @{@"username": newUserProfile.username, @"email": newUserProfile.email};
-    FIRDatabaseReference *ref = [[FIRDatabase database] reference];
-    FIRDatabaseReference *userProfileRef = [ref child:@"userprofile"].childByAutoId;
-    [userProfileRef setValue:newUserProfileInfo];
-}
-
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"ChatDirectoryCell" forIndexPath:indexPath];
     return cell;
@@ -50,10 +42,24 @@
     NSError *error;
     [[FIRAuth auth] signOut:&error];
     if (!error) {
-        // Sign-out succeeded
+
     }
 }
 
+
+-(void)getCurrentUserProfileFromFirebase {
+    FIRDatabaseReference *UserProfileRef = [[[FIRDatabase database]reference]child:@"userprofile"];
+    FIRDatabaseQuery *currentUserProfileQuery = [[UserProfileRef queryOrderedByChild:@"userId"] queryEqualToValue:[FIRAuth auth].currentUser.uid];
+    [currentUserProfileQuery observeEventType:FIRDataEventTypeChildAdded withBlock:^(FIRDataSnapshot *snapshot) {
+    
+        _currentUser = [[UserProfile alloc]initUserProfileWithEmail:snapshot.value[@"email"] username:snapshot.value[@"username"] uid:snapshot.value[@"userId"]];
+        _currentUser.profileImage = [UIImage imageWithData:[NSData dataWithContentsOfURL:[NSURL URLWithString:snapshot.value[@"profilePhotoDownloadURL"]]]];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            NSLog(@"PROFILE IMAGE: %@", _currentUser.profileImage.description);
+
+        });
+    }];
+}
 
 /*
 // Override to support conditional editing of the table view.

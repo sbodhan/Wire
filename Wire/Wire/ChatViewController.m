@@ -27,7 +27,6 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     [self retrieveMessagesFromFirebase];
-    [self getCurrentUserProfileFromFirebase];
     [self JSQMessageBubbleSetup];
     _messages = [[NSMutableArray alloc]init];
     _avatars = [[NSMutableArray alloc]init];
@@ -110,14 +109,6 @@
         [_messages addObject:message];
          
         [self.collectionView reloadData];
-    }];
-}
-
--(void)getCurrentUserProfileFromFirebase {
-    FIRDatabaseReference *UserProfileRef = [[[FIRDatabase database]reference]child:@"userprofile"];
-    FIRDatabaseQuery *currentUserProfileQuery = [[UserProfileRef queryOrderedByChild:@"userId"] queryEqualToValue:[FIRAuth auth].currentUser.uid];
-    [currentUserProfileQuery observeEventType:FIRDataEventTypeChildAdded withBlock:^(FIRDataSnapshot *snapshot) {
-        NSLog(@"UserProfile SnapShot: %@", snapshot.value);
     }];
 }
 
