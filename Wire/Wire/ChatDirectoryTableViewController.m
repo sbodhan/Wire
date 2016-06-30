@@ -17,60 +17,35 @@
 @implementation ChatDirectoryTableViewController
 
 - (void)viewDidLoad {
-    [self setValuesToDatabase];
+   // [self setValuesToDatabase];
     [super viewDidLoad];
-  
-  //ref = [[FIRDatabase database] reference];
-    
 }
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
 }
 
 #pragma mark - Table view data source
-
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-
+    - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     return 1;
 }
 
 
 -(void)setValuesToDatabase{
-    
     UserProfile *newUserProfile = [[UserProfile alloc]init];
     newUserProfile.username = @"Sarmila";
     newUserProfile.email = @"something@hotmail.com";
-   // newUserProfile.userProfileArray =  [[NSMutableArray alloc]init];
-    NSLog(@"username %@\n email %@\n",newUserProfile.username, newUserProfile.email);
- 
     NSDictionary *newUserProfileInfo = @{@"username": newUserProfile.username, @"email": newUserProfile.email};
     FIRDatabaseReference *ref = [[FIRDatabase database] reference];
     FIRDatabaseReference *userProfileRef = [ref child:@"userprofile"].childByAutoId;
     [userProfileRef setValue:newUserProfileInfo];
-
 }
-
-//- (IBAction)signOut:(id)sender {
-//    NSLog(@"signout pressed");
-//    NSError *error;
-//    [[FIRAuth auth] signOut:&error];
-//    if (!error) {
-//        NSLog(@"%@", error)
-//        // Sign-out succeeded
-//    }
-//    
-//}
-
-
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"ChatDirectoryCell" forIndexPath:indexPath];
-    
-    
     return cell;
 }
+
 - (IBAction)signOutBtnPressed:(id)sender {
     NSError *error;
     [[FIRAuth auth] signOut:&error];
@@ -78,8 +53,6 @@
         // Sign-out succeeded
     }
 }
-
-
 
 
 /*

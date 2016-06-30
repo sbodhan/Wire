@@ -19,57 +19,57 @@
 @end
 
 @implementation SignUpViewController
+NSString *newPwd;
+NSString *newRepeatPwd;
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    // Do any additional setup after loading the view.
 }
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
 }
 
 - (IBAction)signUpButtonPressed:(id)sender {
-    NSLog(@"SignUp Clicked");
-    if(![_passwordTF.text isEqualToString:_repeatPasswordTF.text]){
-        _invalidEntry.hidden = false;
-        _invalidEntry.text=@"Unmatched password";
-        
-        
-    }
-    else{
-    [[FIRAuth auth]
-     createUserWithEmail:_emailTF.text
-     password:_passwordTF.text
-     completion:^(FIRUser *_Nullable user,
-                  NSError *_Nullable error) {
-         NSLog(@"$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$USER= %@ ERROR=%@", user, error );
-         
-        if(error.code == 17007){
-             NSLog(@"DUPLICATE: %ld", error.code);
-             _invalidEntry.hidden = false;
-             _invalidEntry.text = @"Email already in use";
-         }
-        else if(error.code == 17026){
-             NSLog(@"PASSWORDFORMAT: %ld", error.code);
-             _invalidEntry.hidden = false;
-             _invalidEntry.text = @"Invalid password";
-         }
-         else if(error){
-             NSLog(@"OtherErrors: %ld", error.code);
-             _invalidEntry.hidden = false;
-             _invalidEntry.text=@"Invalid email or password";
-         }
-         
-         
-     }
-     ];
-    }
-
-    
+    [self signUpUserToFirebase];
 }
 
+-(void)signUpUserToFirebase{
+    [self removeSpaceFromPassword];
+    [self validateInputs];
+}
 
+-(void)removeSpaceFromPassword{
+     newPwd = [_passwordTF.text stringByReplacingOccurrencesOfString:@" " withString:@""];
+     newRepeatPwd = [_repeatPasswordTF.text stringByReplacingOccurrencesOfString:@" " withString:@""];
+}
+
+-(void)validateInputs{
+    if(![newPwd isEqualToString:newRepeatPwd]){
+        _invalidEntry.hidden = false;
+        _invalidEntry.text=@"Unmatched password";
+    }
+    else{
+        [[FIRAuth auth]
+         createUserWithEmail:_emailTF.text
+         password:newPwd
+         completion:^(FIRUser *_Nullable user,
+                  NSError *_Nullable error) {
+         
+             if(error.code == 17007){
+             _invalidEntry.hidden = false;
+             _invalidEntry.text = @"Email already in use";
+             }
+             else if(error.code == 17026){
+             _invalidEntry.hidden = false;
+             _invalidEntry.text = @"Invalid password";
+             }
+             else if(error){
+             _invalidEntry.hidden = false;
+             _invalidEntry.text=@"Invalid email or password";
+             }
+         }];
+    }
+}
 
 @end
