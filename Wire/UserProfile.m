@@ -10,7 +10,7 @@
 
 @implementation UserProfile
 
--(instancetype)initUserProfile:(NSString *)email :(NSString *)username :(NSString *)uid{
+-(instancetype)initUserProfileWithEmail:(NSString *)email username:(NSString *)username uid:(NSString *)uid {
     self = [super init];
     if (self){
     _email = email;

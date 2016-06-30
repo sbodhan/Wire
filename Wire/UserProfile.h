@@ -15,6 +15,6 @@
 @property (strong, nonatomic) NSMutableArray *userProfileArray;
 @property (strong, nonatomic) NSString *profileImageDownloadURL;
 
--(instancetype)initUserProfile:(NSString *)email :(NSString *)username :(NSString *)uid;
+-(instancetype)initUserProfileWithEmail:(NSString *)email username:(NSString *)username uid:(NSString *)uid;
 
 @end
