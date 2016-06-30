@@ -30,7 +30,6 @@
     _messages = [[NSMutableArray alloc]init];
     _avatars = [[NSMutableArray alloc]init];
 
-    
     //THESE ARE ONLY FOR TESTING SO APP WON'T CRASH!
     self.senderId = @"325222222";
     self.senderDisplayName = @"user1";
@@ -41,9 +40,10 @@
     [super didReceiveMemoryWarning];
 }
 
+#pragma mark JSQMessagesViewController Required Protocols.
 //Send Button Pressed.
 -(void)didPressSendButton:(UIButton *)button withMessageText:(NSString *)text senderId:(NSString *)senderId senderDisplayName:(NSString *)senderDisplayName date:(NSDate *)date {
-   
+    
     NSString *timestamp = [NSString stringWithFormat:@"%@", date];
     NSDictionary *message = @{@"text": text, @"senderId": senderId, @"senderName": senderDisplayName, @"timestamp":timestamp};
     [self sendMessageToFirebase:message];
@@ -75,7 +75,7 @@
 //AvatarImageData for item at indexPath **this is the avatarImage that needs to be supplied for each text** - REQUIRED
 -(id<JSQMessageAvatarImageDataSource>)collectionView:(JSQMessagesCollectionView *)collectionView avatarImageDataForItemAtIndexPath:(NSIndexPath *)indexPath {
     
-    UIImage *avatarImage = [UIImage imageNamed:@"snapchat"];
+    UIImage *avatarImage = [UIImage imageNamed:@"default_user"];
     
     JSQMessagesAvatarImage *avatar = [JSQMessagesAvatarImage avatarWithImage:avatarImage];
     [_avatars addObject:avatar];
@@ -83,6 +83,7 @@
     return avatar;
 }
 
+//Sets up the colors for the outgoing and incoming message bubbles.
 -(void)JSQMessageBubbleSetup {
     JSQMessagesBubbleImageFactory *bubbleFactory = [[JSQMessagesBubbleImageFactory alloc]init];
     _outgoingBubbleImage = [bubbleFactory outgoingMessagesBubbleImageWithColor:[UIColor blueColor]];
@@ -99,12 +100,21 @@
 
 -(void)retrieveMessagesFromFirebase {
     FIRDatabaseReference *messagesRef = [[[FIRDatabase database]reference]child:@"messages"];
-    [messagesRef observeEventType:FIRDataEventTypeChildAdded withBlock:^(FIRDataSnapshot *snapshot) {
-        NSLog(@"SNAPSHOT: %@", snapshot.value);
+    [messagesRef observeEventType:FIRDataEventTypeChildAdded withBlock:
+     ^(FIRDataSnapshot *snapshot) {
+         
         JSQMessage *message = [[JSQMessage alloc]initWithSenderId:snapshot.value[@"senderId"] senderDisplayName:snapshot.value[@"senderName"] date:snapshot.value[@"timestamp"] text:snapshot.value[@"text"]];
-        NSLog(@"Message From Firebase: %@", message.description);
+         
         [_messages addObject:message];
+         
         [self.collectionView reloadData];
+    }];
+}
+
+-(void)getCurrentUserProfileFromFirebase {
+    FIRDatabaseReference *currentUserProfileRef = [[[FIRDatabase database]reference]child:@"userprofile"];
+    [currentUserProfileRef observeEventType:FIRDataEventTypeChildAdded withBlock:^(FIRDataSnapshot *snapshot) {
+        
     }];
 }
 
