@@ -82,8 +82,6 @@ NSString *newRepeatPwd;
         UserProfile *newUserProfile = [[UserProfile alloc]initUserProfileWithEmail:_emailTF.text username:_usernameTF.text uid:[FIRAuth auth].currentUser.uid];
         NSDictionary *newUserProfileDict = @{@"email": newUserProfile.email, @"username": newUserProfile.username, @"userId": newUserProfile.uid, @"profilePhotoDownloadURL": newUserProfile.profileImageDownloadURL};
         [currentUserProfileRef setValue:newUserProfileDict];
-    } else {
-        NSLog(@"No Current User");
     }
 }
 

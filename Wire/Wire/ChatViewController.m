@@ -12,6 +12,7 @@
 #import "JSQMessagesAvatarImage.h"
 #import "JSQMessagesBubbleImageFactory.h"
 @import FirebaseDatabase;
+@import FirebaseAuth;
 
 @interface ChatViewController ()
 @property (nonatomic, strong) NSMutableArray *messages;
@@ -26,6 +27,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     [self retrieveMessagesFromFirebase];
+    [self getCurrentUserProfileFromFirebase];
     [self JSQMessageBubbleSetup];
     _messages = [[NSMutableArray alloc]init];
     _avatars = [[NSMutableArray alloc]init];
@@ -112,9 +114,10 @@
 }
 
 -(void)getCurrentUserProfileFromFirebase {
-    FIRDatabaseReference *currentUserProfileRef = [[[FIRDatabase database]reference]child:@"userprofile"];
-    [currentUserProfileRef observeEventType:FIRDataEventTypeChildAdded withBlock:^(FIRDataSnapshot *snapshot) {
-        
+    FIRDatabaseReference *UserProfileRef = [[[FIRDatabase database]reference]child:@"userprofile"];
+    FIRDatabaseQuery *currentUserProfileQuery = [[UserProfileRef queryOrderedByChild:@"userId"] queryEqualToValue:[FIRAuth auth].currentUser.uid];
+    [currentUserProfileQuery observeEventType:FIRDataEventTypeChildAdded withBlock:^(FIRDataSnapshot *snapshot) {
+        NSLog(@"UserProfile SnapShot: %@", snapshot.value);
     }];
 }
 
