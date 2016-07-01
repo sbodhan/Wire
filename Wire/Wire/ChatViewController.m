@@ -11,6 +11,7 @@
 #import "JSQMessagesBubbleImage.h"
 #import "JSQMessagesAvatarImage.h"
 #import "JSQMessagesBubbleImageFactory.h"
+#import "JSQMessagesAvatarImageFactory.h"
 @import FirebaseDatabase;
 @import FirebaseAuth;
 
@@ -18,7 +19,11 @@
 @property (nonatomic, strong) NSMutableArray *messages;
 @property (nonatomic, strong) JSQMessagesBubbleImage *outgoingBubbleImage;
 @property (nonatomic, strong) JSQMessagesBubbleImage *incomingBubbleImage;
-@property (nonatomic, strong) NSMutableArray *avatars;
+@property (nonatomic, strong) NSMutableDictionary *avatars;
+@property (nonatomic, strong) UserProfile *userProfile;
+@property (nonatomic, strong) NSMutableArray *userProfiles;
+@property (nonatomic, strong) NSString *profilePhotoDownloadURL;
+
 
 @end
 
@@ -32,7 +37,7 @@
     [self retrieveMessagesFromFirebase];
     [self JSQMessageBubbleSetup];
     _messages = [[NSMutableArray alloc]init];
-    _avatars = [[NSMutableArray alloc]init];
+    _avatars = [[NSMutableDictionary alloc]init];
 
     //THESE ARE ONLY FOR TESTING SO APP WON'T CRASH!
     self.senderId = _currentUserProfile.uid;
@@ -77,17 +82,13 @@
     }
 }
 
-//AvatarImageData for item at indexPath **this is the avatarImage that needs to be supplied for each text** - REQUIRED
+//AvatarImageData for item at indexPath **this is the avatarImage that needs to be supplied for each text** - REQUIRED - return nil if you want to override this and have no avatarImage.
+
 -(id<JSQMessageAvatarImageDataSource>)collectionView:(JSQMessagesCollectionView *)collectionView avatarImageDataForItemAtIndexPath:(NSIndexPath *)indexPath {
-    
-    UIImage *avatarImage = [UIImage imageNamed:@"default_user"];
-    
-    JSQMessagesAvatarImage *avatar = [JSQMessagesAvatarImage avatarWithImage:avatarImage];
-    [_avatars addObject:avatar];
-    
-    //return nil if you want to override this and have no avatarImage.
-    
-    return avatar;
+
+    JSQMessage *message = [_messages objectAtIndex:indexPath.row];
+//    NSLog(@"Avatar For Message: %@", _avatars.description);
+    return _avatars[message.senderId];
 }
 
 //Sets up the colors for the outgoing and incoming message bubbles.
@@ -95,6 +96,13 @@
     JSQMessagesBubbleImageFactory *bubbleFactory = [[JSQMessagesBubbleImageFactory alloc]init];
     _outgoingBubbleImage = [bubbleFactory outgoingMessagesBubbleImageWithColor:[UIColor blueColor]];
     _incomingBubbleImage = [bubbleFactory incomingMessagesBubbleImageWithColor:[UIColor grayColor]];
+}
+
+-(JSQMessagesAvatarImage *)avatarImageWithImage:(UIImage *)image diameter:(NSUInteger)diameter {
+ 
+    JSQMessagesAvatarImage *avatar = [JSQMessagesAvatarImageFactory avatarImageWithImage:[UIImage imageNamed:@"default_user"] diameter:5.0];
+    
+    return avatar;
 }
 
 #pragma mark Firebase Methods
@@ -111,21 +119,55 @@
          
         JSQMessage *message = [[JSQMessage alloc]initWithSenderId:snapshot.value[@"senderId"] senderDisplayName:snapshot.value[@"senderName"] date:snapshot.value[@"timestamp"] text:snapshot.value[@"text"]];
          
-        [_messages addObject:message];
+         if ([message.senderId isEqualToString:self.senderId]) {
+             [self setUpAvatarImages:message.senderId imageURL:[NSURL URLWithString:_currentUserProfile.profileImageDownloadURL] incoming:FALSE];
+         } else {
+             [self getIncomingUserProfilePhotoDownloadURLFromFirebaseWithSenderId:message.senderId completion:^(NSString *urlString) {
+             [self setUpAvatarImages:message.senderId imageURL:[NSURL URLWithString:urlString] incoming:TRUE];
+
+             }];
+         }
          
+        [_messages addObject:message];
         [self.collectionView reloadData];
     }];
 }
 
--(void)retrieveUsersInChatRoom{
+-(NSMutableArray *)retrieveUsersInChatRoom{
 
     FIRDatabaseReference *userprofileRef = [[[FIRDatabase database]reference]child:@"userprofile"];
-//    FIRDatabaseQuery *usersInChatRoomQuery = [[userprofileRef queryOrderedByChild:@"userId"] queryEqualToValue:[FIRAuth auth].currentUser.uid];
     [userprofileRef observeEventType:FIRDataEventTypeChildAdded withBlock:^(FIRDataSnapshot *snapshot) {
-        NSLog(@"Snapshot: %@", snapshot.value);
+        
+        _userProfile = [[UserProfile alloc]initUserProfileWithEmail:snapshot.value[@"email"] username:snapshot.value[@"username"] uid:snapshot.value[@"userId"]];
+        _userProfile.profileImageDownloadURL = snapshot.value[@"profilePhotoDownloadURL"];
+        [_userProfiles addObject:_userProfile];
     }];
-    
+    return _userProfiles;
+}
 
+-(void)setUpAvatarImages:(NSString *)senderId imageURL:(NSURL *)imageURL incoming:(BOOL)incoming {
+    double diameter;
+    
+    if (incoming == TRUE) {
+        diameter = self.collectionView.collectionViewLayout.incomingAvatarViewSize.width;
+    } else {
+        diameter = self.collectionView.collectionViewLayout.outgoingAvatarViewSize.width;
+    }
+    
+    JSQMessagesAvatarImage *avatarImage = [JSQMessagesAvatarImageFactory
+                                           avatarImageWithImage:[UIImage imageWithData:[NSData dataWithContentsOfURL:imageURL]]
+                                           diameter:diameter];
+
+    [_avatars setValue:avatarImage forKey:senderId];
+}
+
+-(void)getIncomingUserProfilePhotoDownloadURLFromFirebaseWithSenderId:(NSString *)senderId completion:(void(^)(NSString *urlString))completion {
+
+    FIRDatabaseReference *userprofileRef = [[[FIRDatabase database]reference]child:@"userprofile"];
+    FIRDatabaseQuery *userThatSentMessageQuery = [[userprofileRef queryOrderedByChild:@"userId"]queryEqualToValue:senderId];
+    [userThatSentMessageQuery observeEventType:FIRDataEventTypeChildAdded withBlock:^(FIRDataSnapshot *snapshot) {
+        completion(snapshot.value[@"profilePhotoDownloadURL"]);
+    }];
 }
 
 @end
