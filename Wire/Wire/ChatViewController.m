@@ -36,7 +36,6 @@
     [super viewDidLoad];
 
     [self retrieveUsersInChatRoom];
-    
     [self retrieveMessagesFromFirebase];
     [self JSQMessageBubbleSetup];
     _messages = [[NSMutableArray alloc]init];
@@ -85,19 +84,17 @@
     }
 }
 
-//-(UICollectionViewCell *)collectionView:(JSQMessagesCollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
-//    
-//    JSQMessage *message = _messages[indexPath.row];
-//
-//    return cell;
-//}
-
 //AvatarImageData for item at indexPath **this is the avatarImage that needs to be supplied for each text** - REQUIRED - return nil if you want to override this and have no avatarImage.
 
 -(id<JSQMessageAvatarImageDataSource>)collectionView:(JSQMessagesCollectionView *)collectionView avatarImageDataForItemAtIndexPath:(NSIndexPath *)indexPath {
-    
-    JSQMessage *message = [_messages objectAtIndex:indexPath.row];
 
+    JSQMessage *message = [_messages objectAtIndex:indexPath.row];
+    
+    if (_avatars[message.senderId] == nil) {
+
+        return [self setPlaceHolderAvatars:message.senderDisplayName];
+    }
+    
     return _avatars[message.senderId];
 }
 
@@ -107,13 +104,6 @@
     _outgoingBubbleImage = [bubbleFactory outgoingMessagesBubbleImageWithColor:[UIColor blueColor]];
     _incomingBubbleImage = [bubbleFactory incomingMessagesBubbleImageWithColor:[UIColor grayColor]];
 }
-
-//-(JSQMessagesAvatarImage *)avatarImageWithImage:(UIImage *)image diameter:(NSUInteger)diameter {
-//    
-//    JSQMessagesAvatarImage *avatar = [JSQMessagesAvatarImageFactory avatarImageWithImage:[UIImage imageNamed:@"default_user"] diameter:5.0];
-//    
-//    return avatar;
-//}
 
 #pragma mark Firebase Methods
 
@@ -128,13 +118,7 @@
      ^(FIRDataSnapshot *snapshot) {
          
         JSQMessage *message = [[JSQMessage alloc]initWithSenderId:snapshot.value[@"senderId"] senderDisplayName:snapshot.value[@"senderName"] date:snapshot.value[@"timestamp"] text:snapshot.value[@"text"]];
-         
-         /*************************************************************************************
 
-        Option 1: AFNetworking and the placeholder image for the avatar. - look into what other apps do.
-          
-         ***************************************************************************************/
-         
          if ([message.senderId isEqualToString:self.senderId]) {
              [self downloadImageFromFirebaseWithAFNetworking:_currentUserProfile.profileImageDownloadURL completion:^(UIImage *profileImage) {
                  [self setUpAvatarImages:message.senderId image:profileImage incoming:FALSE];
@@ -142,10 +126,10 @@
              }];
             } else {
              [self getIncomingUserProfilePhotoDownloadURLFromFirebaseWithSenderId:message.senderId completion:^(NSString *urlString) {
-                    [self downloadImageFromFirebaseWithAFNetworking:urlString completion:^(UIImage *profileImage) {
-                        [self setUpAvatarImages:message.senderId image:profileImage incoming:TRUE];
-                        [self.collectionView reloadData];
-                    }];
+                [self downloadImageFromFirebaseWithAFNetworking:urlString completion:^(UIImage *profileImage) {
+                    [self setUpAvatarImages:message.senderId image:profileImage incoming:TRUE];
+                    [self.collectionView reloadData];
+                }];
              }];
          }
         [_messages addObject:message];
@@ -167,17 +151,17 @@
 
 -(void)setUpAvatarImages:(NSString *)senderId image:(UIImage *)image incoming:(BOOL)incoming {
     double diameter;
-    
+
     if (incoming == TRUE) {
         diameter = self.collectionView.collectionViewLayout.incomingAvatarViewSize.width;
     } else {
         diameter = self.collectionView.collectionViewLayout.outgoingAvatarViewSize.width;
     }
-    
+
     JSQMessagesAvatarImage *avatarImage = [JSQMessagesAvatarImageFactory
                                            avatarImageWithImage:image
                                            diameter:diameter];
-
+    
     [_avatars setValue:avatarImage forKey:senderId];
 }
 
@@ -198,12 +182,18 @@
     manager.responseSerializer = [AFImageResponseSerializer serializer];
     [manager GET:url.absoluteString parameters:nil progress:nil success:^(NSURLSessionDataTask *task, UIImage *responseData) {
         completion(responseData);
-        NSLog(@"RESPONSE ************************ %@", responseData);
     } failure:^(NSURLSessionDataTask *task, NSError *error) {
         NSLog(@"Error: %@", error);
-
     }];
 
 }
+
+-(JSQMessagesAvatarImage *)setPlaceHolderAvatars:(NSString *)senderDisplayName {
+
+ JSQMessagesAvatarImage *placeholderAvatarImage = [JSQMessagesAvatarImageFactory avatarImageWithUserInitials:[senderDisplayName substringToIndex:1] backgroundColor:[UIColor blackColor] textColor:[UIColor whiteColor] font:[UIFont systemFontOfSize:12] diameter:self.collectionView.collectionViewLayout.incomingAvatarViewSize.width];
+    
+    return placeholderAvatarImage;
+}
+
 
 @end
