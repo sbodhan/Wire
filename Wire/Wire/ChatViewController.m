@@ -138,6 +138,7 @@
          if ([message.senderId isEqualToString:self.senderId]) {
              [self downloadImageFromFirebaseWithAFNetworking:_currentUserProfile.profileImageDownloadURL completion:^(UIImage *profileImage) {
                  [self setUpAvatarImages:message.senderId image:profileImage incoming:FALSE];
+                 [self.collectionView reloadData];
              }];
             } else {
              [self getIncomingUserProfilePhotoDownloadURLFromFirebaseWithSenderId:message.senderId completion:^(NSString *urlString) {
@@ -197,6 +198,7 @@
     manager.responseSerializer = [AFImageResponseSerializer serializer];
     [manager GET:url.absoluteString parameters:nil progress:nil success:^(NSURLSessionDataTask *task, UIImage *responseData) {
         completion(responseData);
+        NSLog(@"RESPONSE ************************ %@", responseData);
     } failure:^(NSURLSessionDataTask *task, NSError *error) {
         NSLog(@"Error: %@", error);
 
