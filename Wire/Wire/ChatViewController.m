@@ -27,23 +27,19 @@
 @property (nonatomic, strong) NSMutableArray *userProfiles;
 @property (nonatomic, strong) NSString *profilePhotoDownloadURL;
 
-
 @end
 
 @implementation ChatViewController
 
-- (void)viewDidLoad {
-    [super viewDidLoad];
 
+- (void)viewDidLoad {
+    [self setJSQsenderIdAndDisplayName];
+    [super viewDidLoad];
     [self retrieveUsersInChatRoom];
     [self retrieveMessagesFromFirebase];
     [self JSQMessageBubbleSetup];
     _messages = [[NSMutableArray alloc]init];
     _avatars = [[NSMutableDictionary alloc]init];
-
-    //THESE ARE ONLY FOR TESTING SO APP WON'T CRASH!
-    self.senderId = _currentUserProfile.uid;
-    self.senderDisplayName = _currentUserProfile.username;
     
 }
 
@@ -195,7 +191,14 @@
     return placeholderAvatarImage;
 }
 
-
+-(void)setJSQsenderIdAndDisplayName {
+    self.senderId = [FIRAuth auth].currentUser.uid;
+    if (_currentUserProfile == nil) {
+        self.senderDisplayName = @"User";
+    } else {
+        self.senderDisplayName = _currentUserProfile.username;
+    }
+}
 
 - (void)didPressAccessoryButton:(UIButton *)sender{
     NSLog(@"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
