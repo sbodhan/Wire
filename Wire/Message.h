@@ -15,6 +15,7 @@
 @property (strong,nonatomic) NSString *text;
 @property (strong,nonatomic) NSString *sender;
 @property (strong,nonatomic) NSString *uid;
+@property (strong,nonatomic) NSString *imgDownloadURL;
 -(instancetype)initMessage:(NSString *)timeStamp :(NSString *)text :(NSString *)uid;
 
 
