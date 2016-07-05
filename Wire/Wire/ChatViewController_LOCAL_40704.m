@@ -196,38 +196,4 @@
 }
 
 
-
-- (void)didPressAccessoryButton:(UIButton *)sender{
-    NSLog(@"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-    
-    UIAlertController * view=   [UIAlertController
-                                 alertControllerWithTitle:@"Where do you want the photos from?"
-                                 message:nil
-                                 preferredStyle:UIAlertControllerStyleActionSheet];
-    
-    UIAlertAction* ok = [UIAlertAction
-                         actionWithTitle:@"Gallery"
-                         style:UIAlertActionStyleDefault
-                         handler:^(UIAlertAction * action)
-                         {
-                             //Do some thing here
-                             [view dismissViewControllerAnimated:YES completion:nil];
-                             
-                         }];
-    UIAlertAction* cancel = [UIAlertAction
-                             actionWithTitle:@"Take a photo"
-                             style:UIAlertActionStyleDefault
-                             handler:^(UIAlertAction * action)
-                             {
-                                 [view dismissViewControllerAnimated:YES completion:nil];
-                                 
-                             }];
-    
-    
-    [view addAction:ok];
-    [view addAction:cancel];
-    [self presentViewController:view animated:YES completion:nil];
-}
-
-
 @end
