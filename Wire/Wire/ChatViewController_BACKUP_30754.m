@@ -12,10 +12,13 @@
 #import "JSQMessagesAvatarImage.h"
 #import "JSQMessagesBubbleImageFactory.h"
 #import "JSQMessagesAvatarImageFactory.h"
+<<<<<<< HEAD
 @import FirebaseStorage;
+=======
 #import "JSQMessagesCollectionViewCell.h"
 #import "UIImageView+AFNetworking.h"
 #import "AFNetworking.h"
+>>>>>>> master
 @import FirebaseDatabase;
 @import FirebaseAuth;
 
@@ -67,7 +70,7 @@ NSString *imageURL;
     [self uploadPhotoToFirebase:resizedImgData];
     
     NSString *timestamp = [NSString stringWithFormat:@"%@", date];
-    NSDictionary *message = @{@"text": @" ", @"senderId": senderId, @"senderName": senderDisplayName, @"timestamp":timestamp, @"ImageURL": @" "};
+    NSDictionary *message = @{@"text": text, @"senderId": senderId, @"senderName": senderDisplayName, @"timestamp":timestamp, @"ImageURL": imageURL};
     [self sendMessageToFirebase:message];
     
 }
@@ -115,12 +118,15 @@ NSString *imageURL;
     _incomingBubbleImage = [bubbleFactory incomingMessagesBubbleImageWithColor:[UIColor grayColor]];
 }
 
+<<<<<<< HEAD
 -(JSQMessagesAvatarImage *)avatarImageWithImage:(UIImage *)image diameter:(NSUInteger)diameter {
     
     JSQMessagesAvatarImage *avatar = [JSQMessagesAvatarImageFactory avatarImageWithImage:[UIImage imageNamed:@"default_user"] diameter:5.0];
     return avatar;
 }
 
+=======
+>>>>>>> master
 #pragma mark Firebase Methods
 
 -(void)sendMessageToFirebase:(NSDictionary *)message {
@@ -214,6 +220,8 @@ NSString *imageURL;
 
 
 - (void)didPressAccessoryButton:(UIButton *)sender{
+    NSLog(@"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+    
     UIAlertController * view=   [UIAlertController
                                  alertControllerWithTitle:@"Where do you want the photos from?"
                                  message:nil

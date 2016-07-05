@@ -67,7 +67,7 @@ NSString *imageURL;
     [self uploadPhotoToFirebase:resizedImgData];
     
     NSString *timestamp = [NSString stringWithFormat:@"%@", date];
-    NSDictionary *message = @{@"text": @" ", @"senderId": senderId, @"senderName": senderDisplayName, @"timestamp":timestamp, @"ImageURL": @" "};
+    NSDictionary *message = @{@"text": text, @"senderId": senderId, @"senderName": senderDisplayName, @"timestamp":timestamp, @"ImageURL": imageURL};
     [self sendMessageToFirebase:message];
     
 }
@@ -113,12 +113,6 @@ NSString *imageURL;
     JSQMessagesBubbleImageFactory *bubbleFactory = [[JSQMessagesBubbleImageFactory alloc]init];
     _outgoingBubbleImage = [bubbleFactory outgoingMessagesBubbleImageWithColor:[UIColor blueColor]];
     _incomingBubbleImage = [bubbleFactory incomingMessagesBubbleImageWithColor:[UIColor grayColor]];
-}
-
--(JSQMessagesAvatarImage *)avatarImageWithImage:(UIImage *)image diameter:(NSUInteger)diameter {
-    
-    JSQMessagesAvatarImage *avatar = [JSQMessagesAvatarImageFactory avatarImageWithImage:[UIImage imageNamed:@"default_user"] diameter:5.0];
-    return avatar;
 }
 
 #pragma mark Firebase Methods
@@ -214,6 +208,8 @@ NSString *imageURL;
 
 
 - (void)didPressAccessoryButton:(UIButton *)sender{
+    NSLog(@"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+    
     UIAlertController * view=   [UIAlertController
                                  alertControllerWithTitle:@"Where do you want the photos from?"
                                  message:nil

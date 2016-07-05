@@ -12,7 +12,6 @@
 #import "JSQMessagesAvatarImage.h"
 #import "JSQMessagesBubbleImageFactory.h"
 #import "JSQMessagesAvatarImageFactory.h"
-@import FirebaseStorage;
 #import "JSQMessagesCollectionViewCell.h"
 #import "UIImageView+AFNetworking.h"
 #import "AFNetworking.h"
@@ -27,16 +26,11 @@
 @property (nonatomic, strong) UserProfile *userProfile;
 @property (nonatomic, strong) NSMutableArray *userProfiles;
 @property (nonatomic, strong) NSString *profilePhotoDownloadURL;
-@property (strong, nonatomic) FIRStorageReference *firebaseStorageRef;
-@property (strong, nonatomic) FIRStorage *firebaseStorage;
-
 
 
 @end
 
 @implementation ChatViewController
-UIImage *resizedImg;
-NSString *imageURL;
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -62,12 +56,8 @@ NSString *imageURL;
 
 -(void)didPressSendButton:(UIButton *)button withMessageText:(NSString *)text senderId:(NSString *)senderId senderDisplayName:(NSString *)senderDisplayName date:(NSDate *)date {
     
-    [self firebaseSetUp];
-    NSData *resizedImgData =  UIImageJPEGRepresentation(resizedImg, .50);
-    [self uploadPhotoToFirebase:resizedImgData];
-    
     NSString *timestamp = [NSString stringWithFormat:@"%@", date];
-    NSDictionary *message = @{@"text": @" ", @"senderId": senderId, @"senderName": senderDisplayName, @"timestamp":timestamp, @"ImageURL": @" "};
+    NSDictionary *message = @{@"text": text, @"senderId": senderId, @"senderName": senderDisplayName, @"timestamp":timestamp};
     [self sendMessageToFirebase:message];
     
 }
@@ -113,12 +103,6 @@ NSString *imageURL;
     JSQMessagesBubbleImageFactory *bubbleFactory = [[JSQMessagesBubbleImageFactory alloc]init];
     _outgoingBubbleImage = [bubbleFactory outgoingMessagesBubbleImageWithColor:[UIColor blueColor]];
     _incomingBubbleImage = [bubbleFactory incomingMessagesBubbleImageWithColor:[UIColor grayColor]];
-}
-
--(JSQMessagesAvatarImage *)avatarImageWithImage:(UIImage *)image diameter:(NSUInteger)diameter {
-    
-    JSQMessagesAvatarImage *avatar = [JSQMessagesAvatarImageFactory avatarImageWithImage:[UIImage imageNamed:@"default_user"] diameter:5.0];
-    return avatar;
 }
 
 #pragma mark Firebase Methods
@@ -214,6 +198,8 @@ NSString *imageURL;
 
 
 - (void)didPressAccessoryButton:(UIButton *)sender{
+    NSLog(@"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+    
     UIAlertController * view=   [UIAlertController
                                  alertControllerWithTitle:@"Where do you want the photos from?"
                                  message:nil
@@ -224,7 +210,7 @@ NSString *imageURL;
                          style:UIAlertActionStyleDefault
                          handler:^(UIAlertAction * action)
                          {
-                             [self chooseFromGallery];
+                             //Do some thing here
                              [view dismissViewControllerAnimated:YES completion:nil];
                              
                          }];
@@ -233,7 +219,6 @@ NSString *imageURL;
                              style:UIAlertActionStyleDefault
                              handler:^(UIAlertAction * action)
                              {
-                                 [self takePicture];
                                  [view dismissViewControllerAnimated:YES completion:nil];
                                  
                              }];
@@ -243,73 +228,6 @@ NSString *imageURL;
     [view addAction:cancel];
     [self presentViewController:view animated:YES completion:nil];
 }
-
-
-
-- (void)takePicture{
-    UIImagePickerController *imagePicker = [[UIImagePickerController alloc] init];
-    [self presentViewController:imagePicker animated:NO completion:nil];
-    imagePicker.modalPresentationStyle = UIModalPresentationCurrentContext;
-    [imagePicker setDelegate:self];
-    imagePicker.sourceType = UIImagePickerControllerSourceTypeCamera;
-    NSLog(@"photo taking starts");
-}
-
-- (void)chooseFromGallery{
-    UIImagePickerController *imagePicker = [[UIImagePickerController alloc] init];
-    imagePicker.modalPresentationStyle = UIModalPresentationCurrentContext;
-    [imagePicker setDelegate:self];
-    [self presentViewController:imagePicker animated:NO completion:nil];
-    NSLog(@"photo choosing starts");
-}
-
--(void)imagePickerControllerDidCancel:(UIImagePickerController *)picker{
-    [self dismissViewControllerAnimated:YES completion:nil];
-}
-
--(void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary<NSString *,id> *)info{
-    UIImage *image = [info valueForKey:UIImagePickerControllerOriginalImage];
-    resizedImg = [self reduceImageSize:image];
-    [self dismissViewControllerAnimated:YES completion:nil];
-//    self.inputToolbar.contentView.textView.text = @"badbad";
-}
-
-
--(UIImage *)reduceImageSize:(UIImage *)image {
-    NSLog(@"ORIGINAL IMAGE: width-%f, height-%f", image.size.width, image.size.height);
-    //creating a frame
-    CGSize newSize = CGSizeMake(image.size.width/6, image.size.height/6);
-    UIGraphicsBeginImageContextWithOptions(newSize, false, 0.0);
-    //Where to the frame the new painting is going to be placed
-    [image drawInRect:CGRectMake(0, 0, newSize.width, newSize.height)];
-    resizedImg = UIGraphicsGetImageFromCurrentImageContext();
-    NSLog(@"SMALL IMAGE: width-%f, height-%f", resizedImg.size.width, resizedImg.size.height);
-    return resizedImg;
-}
-
--(void)firebaseSetUp {
-    _firebaseStorage = [FIRStorage storage];
-    _firebaseStorageRef = [_firebaseStorage referenceForURL:@"gs://wire-e0cde.appspot.com"];
-}
-
--(void)uploadPhotoToFirebase:(NSData *)imageData {
-    
-    //Create a uniqueID for the image and add it to the end of the images reference.
-    NSString *uniqueID = [[NSUUID UUID]UUIDString];
-    NSString *newImageReference = [NSString stringWithFormat:@"images/%@.jpg", uniqueID];
-    //imagesRef creates a reference for the images folder and then adds a child to that folder, which will be every time a photo is taken.
-    FIRStorageReference *imagesRef = [_firebaseStorageRef child:newImageReference];
-    //This uploads the photo's NSData onto Firebase Storage.
-    FIRStorageUploadTask *uploadTask = [imagesRef putData:imageData metadata:nil completion:^(FIRStorageMetadata *metadata, NSError *error) {
-        if (error) {
-            NSLog(@"ERROR: %@", error.description);
-        } else {
-            imageURL = [NSString stringWithFormat:@"%@", metadata.downloadURL];
-        }
-    }];
-    [uploadTask resume];
-}
-
 
 
 @end
