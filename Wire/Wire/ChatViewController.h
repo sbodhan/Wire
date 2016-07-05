@@ -10,7 +10,7 @@
 #import "JSQMessagesViewController.h"
 #import "UserProfile.h"
 
-@interface ChatViewController : JSQMessagesViewController
+@interface ChatViewController : JSQMessagesViewController<UIImagePickerControllerDelegate,UINavigationControllerDelegate>
 
 @property(strong, nonatomic) UserProfile *currentUserProfile;
 
