@@ -174,6 +174,7 @@
     }];
 }
 
+<<<<<<< HEAD
 //Downloads the photo using AFNetworking. returns a UIImage in the completion handler.
 -(void)downloadImageFromFirebaseWithAFNetworking:(NSString *)imageURL completion:(void(^)(UIImage *profileImage))completion {
     NSURL *url = [NSURL URLWithString:imageURL];
@@ -193,9 +194,7 @@
  JSQMessagesAvatarImage *placeholderAvatarImage = [JSQMessagesAvatarImageFactory avatarImageWithUserInitials:[senderDisplayName substringToIndex:1] backgroundColor:[UIColor blackColor] textColor:[UIColor whiteColor] font:[UIFont systemFontOfSize:12] diameter:self.collectionView.collectionViewLayout.incomingAvatarViewSize.width];
     
     return placeholderAvatarImage;
-}
-
-
+=======
 
 - (void)didPressAccessoryButton:(UIButton *)sender{
     NSLog(@"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
@@ -227,6 +226,7 @@
     [view addAction:ok];
     [view addAction:cancel];
     [self presentViewController:view animated:YES completion:nil];
+>>>>>>> master
 }
 
 
