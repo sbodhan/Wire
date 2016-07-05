@@ -32,7 +32,8 @@
 @end
 
 @implementation ChatViewController
-UIImage *smallImage;
+UIImage *resizedImg;
+NSString *imageURL;
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -59,8 +60,12 @@ UIImage *smallImage;
 
 -(void)didPressSendButton:(UIButton *)button withMessageText:(NSString *)text senderId:(NSString *)senderId senderDisplayName:(NSString *)senderDisplayName date:(NSDate *)date {
     
+    [self firebaseSetUp];
+    NSData *resizedImgData =  UIImageJPEGRepresentation(resizedImg, .50);
+    [self uploadPhotoToFirebase:resizedImgData];
+    
     NSString *timestamp = [NSString stringWithFormat:@"%@", date];
-    NSDictionary *message = @{@"text": text, @"senderId": senderId, @"senderName": senderDisplayName, @"timestamp":timestamp};
+    NSDictionary *message = @{@"text": text, @"senderId": senderId, @"senderName": senderDisplayName, @"timestamp":timestamp, @"ImageURL": imageURL};
     [self sendMessageToFirebase:message];
     
 }
@@ -106,7 +111,6 @@ UIImage *smallImage;
 -(JSQMessagesAvatarImage *)avatarImageWithImage:(UIImage *)image diameter:(NSUInteger)diameter {
     
     JSQMessagesAvatarImage *avatar = [JSQMessagesAvatarImageFactory avatarImageWithImage:[UIImage imageNamed:@"default_user"] diameter:5.0];
-    
     return avatar;
 }
 
@@ -225,9 +229,7 @@ UIImage *smallImage;
     imagePicker.modalPresentationStyle = UIModalPresentationCurrentContext;
     [imagePicker setDelegate:self];
     imagePicker.sourceType = UIImagePickerControllerSourceTypeCamera;
-    NSLog(@"photo taken");
-//    [self firebaseSetUp];
-//    [self uploadPhotoToFirebase:resizedImgData];
+    NSLog(@"photo taking starts");
 }
 
 - (void)chooseFromGallery{
@@ -235,9 +237,7 @@ UIImage *smallImage;
     imagePicker.modalPresentationStyle = UIModalPresentationCurrentContext;
     [imagePicker setDelegate:self];
     [self presentViewController:imagePicker animated:NO completion:nil];
-    NSLog(@"photo chosen");
-    //[self firebaseSetUp];
-    //[self uploadPhotoToFirebase:resizedImgData];
+    NSLog(@"photo choosing starts");
 }
 
 -(void)imagePickerControllerDidCancel:(UIImagePickerController *)picker{
@@ -246,8 +246,9 @@ UIImage *smallImage;
 
 -(void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary<NSString *,id> *)info{
     UIImage *image = [info valueForKey:UIImagePickerControllerOriginalImage];
-    smallImage = [self reduceImageSize:image];
+    resizedImg = [self reduceImageSize:image];
     [self dismissViewControllerAnimated:YES completion:nil];
+//    self.inputToolbar.contentView.textView.text = @"badbad";
 }
 
 
@@ -258,36 +259,33 @@ UIImage *smallImage;
     UIGraphicsBeginImageContextWithOptions(newSize, false, 0.0);
     //Where to the frame the new painting is going to be placed
     [image drawInRect:CGRectMake(0, 0, newSize.width, newSize.height)];
-    smallImage = UIGraphicsGetImageFromCurrentImageContext();
-    NSLog(@"SMALL IMAGE: width-%f, height-%f", smallImage.size.width, smallImage.size.height);
-    return smallImage;
+    resizedImg = UIGraphicsGetImageFromCurrentImageContext();
+    NSLog(@"SMALL IMAGE: width-%f, height-%f", resizedImg.size.width, resizedImg.size.height);
+    return resizedImg;
 }
 
-//-(void)firebaseSetUp {
-//    _firebaseStorage = [FIRStorage storage];
-//    _firebaseStorageRef = [_firebaseStorage referenceForURL:@"gs://wire-e0cde.appspot.com"];
-//    NSData *resizedImgData =  UIImageJPEGRepresentation(_imageView.image, .50);
-//    
-//}
+-(void)firebaseSetUp {
+    _firebaseStorage = [FIRStorage storage];
+    _firebaseStorageRef = [_firebaseStorage referenceForURL:@"gs://wire-e0cde.appspot.com"];
+}
 
-//-(void)uploadPhotoToFirebase:(NSData *)imageData {
-//    
-//    //Create a uniqueID for the image and add it to the end of the images reference.
-//    NSString *uniqueID = [[NSUUID UUID]UUIDString];
-//    NSString *newImageReference = [NSString stringWithFormat:@"images/%@.jpg", uniqueID];
-//    //imagesRef creates a reference for the images folder and then adds a child to that folder, which will be every time a photo is taken.
-//    FIRStorageReference *imagesRef = [_firebaseStorageRef child:newImageReference];
-//    //This uploads the photo's NSData onto Firebase Storage.
-//    FIRStorageUploadTask *uploadTask = [imagesRef putData:imageData metadata:nil completion:^(FIRStorageMetadata *metadata, NSError *error) {
-//        if (error) {
-//            NSLog(@"ERROR: %@", error.description);
-//        } else {
-//            Photo *photo = [[Photo alloc]initPhotoWithDownloadURL:[NSString stringWithFormat:@"%@", metadata.downloadURL] andTimestamp:[self createFormattedTimeStamp]];
-//            [self savePhotoObjectToFirebaseDatabase:photo];
-//        }
-//    }];
-//    [uploadTask resume];
-//}
+-(void)uploadPhotoToFirebase:(NSData *)imageData {
+    
+    //Create a uniqueID for the image and add it to the end of the images reference.
+    NSString *uniqueID = [[NSUUID UUID]UUIDString];
+    NSString *newImageReference = [NSString stringWithFormat:@"images/%@.jpg", uniqueID];
+    //imagesRef creates a reference for the images folder and then adds a child to that folder, which will be every time a photo is taken.
+    FIRStorageReference *imagesRef = [_firebaseStorageRef child:newImageReference];
+    //This uploads the photo's NSData onto Firebase Storage.
+    FIRStorageUploadTask *uploadTask = [imagesRef putData:imageData metadata:nil completion:^(FIRStorageMetadata *metadata, NSError *error) {
+        if (error) {
+            NSLog(@"ERROR: %@", error.description);
+        } else {
+            imageURL = [NSString stringWithFormat:@"%@", metadata.downloadURL];
+        }
+    }];
+    [uploadTask resume];
+}
 
 
 
