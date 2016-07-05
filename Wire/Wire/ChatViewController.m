@@ -87,7 +87,7 @@
 -(id<JSQMessageAvatarImageDataSource>)collectionView:(JSQMessagesCollectionView *)collectionView avatarImageDataForItemAtIndexPath:(NSIndexPath *)indexPath {
 
     JSQMessage *message = [_messages objectAtIndex:indexPath.row];
-//    NSLog(@"Avatar For Message: %@", _avatars.description);
+
     return _avatars[message.senderId];
 }
 
@@ -99,7 +99,7 @@
 }
 
 -(JSQMessagesAvatarImage *)avatarImageWithImage:(UIImage *)image diameter:(NSUInteger)diameter {
- 
+    
     JSQMessagesAvatarImage *avatar = [JSQMessagesAvatarImageFactory avatarImageWithImage:[UIImage imageNamed:@"default_user"] diameter:5.0];
     
     return avatar;
@@ -119,12 +119,20 @@
          
         JSQMessage *message = [[JSQMessage alloc]initWithSenderId:snapshot.value[@"senderId"] senderDisplayName:snapshot.value[@"senderName"] date:snapshot.value[@"timestamp"] text:snapshot.value[@"text"]];
          
+         /*************************************************************************************
+
+        Option 1: AFNetworking and the placeholder image for the avatar. - look into what other apps do.
+          
+         ***************************************************************************************/
+         
          if ([message.senderId isEqualToString:self.senderId]) {
              [self setUpAvatarImages:message.senderId imageURL:[NSURL URLWithString:_currentUserProfile.profileImageDownloadURL] incoming:FALSE];
          } else {
              [self getIncomingUserProfilePhotoDownloadURLFromFirebaseWithSenderId:message.senderId completion:^(NSString *urlString) {
-             [self setUpAvatarImages:message.senderId imageURL:[NSURL URLWithString:urlString] incoming:TRUE];
-
+                 dispatch_async(dispatch_get_main_queue(), ^{
+                     [self setUpAvatarImages:message.senderId imageURL:[NSURL URLWithString:urlString] incoming:TRUE];
+                     [self.collectionView reloadData];
+                 });
              }];
          }
          
@@ -153,7 +161,7 @@
     } else {
         diameter = self.collectionView.collectionViewLayout.outgoingAvatarViewSize.width;
     }
-    
+        
     JSQMessagesAvatarImage *avatarImage = [JSQMessagesAvatarImageFactory
                                            avatarImageWithImage:[UIImage imageWithData:[NSData dataWithContentsOfURL:imageURL]]
                                            diameter:diameter];
