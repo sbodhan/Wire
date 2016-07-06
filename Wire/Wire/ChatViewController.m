@@ -8,6 +8,8 @@
 
 #import "ChatViewController.h"
 #import "JSQMessage.h"
+
+#import "JSQPhotoMediaItem.h"
 #import "JSQMessagesBubbleImage.h"
 #import "JSQMessagesAvatarImage.h"
 #import "JSQMessagesBubbleImageFactory.h"
@@ -37,10 +39,10 @@
 @implementation ChatViewController
 UIImage *resizedImg;
 NSString *imageURL;
+JSQMessage *message;
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-
     [self retrieveUsersInChatRoom];
     [self retrieveMessagesFromFirebase];
     [self JSQMessageBubbleSetup];
@@ -50,6 +52,8 @@ NSString *imageURL;
     //THESE ARE ONLY FOR TESTING SO APP WON'T CRASH!
     self.senderId = _currentUserProfile.uid;
     self.senderDisplayName = _currentUserProfile.username;
+    
+    self.showTypingIndicator = !self.showTypingIndicator;
     
 }
 
@@ -62,12 +66,13 @@ NSString *imageURL;
 
 -(void)didPressSendButton:(UIButton *)button withMessageText:(NSString *)text senderId:(NSString *)senderId senderDisplayName:(NSString *)senderDisplayName date:(NSDate *)date {
     
+    self.showTypingIndicator = !self.showTypingIndicator;
     [self firebaseSetUp];
     NSData *resizedImgData =  UIImageJPEGRepresentation(resizedImg, .50);
     [self uploadPhotoToFirebase:resizedImgData];
     
     NSString *timestamp = [NSString stringWithFormat:@"%@", date];
-    NSDictionary *message = @{@"text": @" ", @"senderId": senderId, @"senderName": senderDisplayName, @"timestamp":timestamp, @"ImageURL": @" "};
+    NSDictionary *message = @{@"text": text, @"senderId": senderId, @"senderName": senderDisplayName, @"timestamp":timestamp, @"ImageURL": @" "};
     [self sendMessageToFirebase:message];
     
 }
@@ -128,12 +133,27 @@ NSString *imageURL;
     [messagesRef setValue:message];
 }
 
+
+
+
+
+
 -(void)retrieveMessagesFromFirebase {
+    
+    JSQPhotoMediaItem *photoItem = [[JSQPhotoMediaItem alloc] initWithImage:resizedImg];
+    message = [[JSQMessage alloc]initWithSenderId:self.senderId senderDisplayName:self.senderDisplayName date:[NSDate date] media:photoItem];
+
     FIRDatabaseReference *messagesRef = [[[FIRDatabase database]reference]child:@"messages"];
     [messagesRef observeEventType:FIRDataEventTypeChildAdded withBlock:
      ^(FIRDataSnapshot *snapshot) {
          
-        JSQMessage *message = [[JSQMessage alloc]initWithSenderId:snapshot.value[@"senderId"] senderDisplayName:snapshot.value[@"senderName"] date:snapshot.value[@"timestamp"] text:snapshot.value[@"text"]];
+         
+         if (snapshot.value[@"imageURL"] != nil){
+//             JSQPhotoMediaItem *photoItem = [[JSQPhotoMediaItem alloc] initWithImage:resizedImg];
+//             message = [[JSQMessage alloc]initWithSenderId:snapshot.value[@"senderId"] senderDisplayName:snapshot.value[@"senderName"] date:snapshot.value[@"timestamp"]media:photoItem];
+
+         }else{
+             message = [[JSQMessage alloc]initWithSenderId:snapshot.value[@"senderId"] senderDisplayName:snapshot.value[@"senderName"] date:snapshot.value[@"timestamp"] text:snapshot.value[@"text"]];}
 
          if ([message.senderId isEqualToString:self.senderId]) {
              [self downloadImageFromFirebaseWithAFNetworking:_currentUserProfile.profileImageDownloadURL completion:^(UIImage *profileImage) {
