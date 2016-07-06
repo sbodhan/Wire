@@ -16,7 +16,6 @@
 #import "JSQMessagesAvatarImageFactory.h"
 @import FirebaseStorage;
 #import "JSQMessagesCollectionViewCell.h"
-#import "NSString+JSQMessages.h"
 #import "UIImageView+AFNetworking.h"
 #import "AFNetworking.h"
 @import FirebaseDatabase;
@@ -31,17 +30,26 @@
 @property (nonatomic, strong) UserProfile *userProfile;
 @property (nonatomic, strong) NSMutableArray *userProfiles;
 @property (nonatomic, strong) NSString *profilePhotoDownloadURL;
+<<<<<<< HEAD
 @property (strong, nonatomic) FIRStorageReference *firebaseStorageRef;
 @property (strong, nonatomic) FIRStorage *firebaseStorage;
 
+=======
+@property (nonatomic, strong) FIRStorageReference *firebaseStorageRef;
+@property (nonatomic, strong) FIRStorage *firebaseStorage;
+>>>>>>> master
 
 @end
 
 @implementation ChatViewController
+<<<<<<< HEAD
 UIImage *resizedImg;
 NSString *imageURL;
 JSQMessage *message;
+=======
 NSData *localfile;
+>>>>>>> master
+
 
 - (void)viewDidLoad {
     [self setJSQsenderIdAndDisplayName];
@@ -114,27 +122,6 @@ NSData *localfile;
     return _avatars[message.senderId];
 }
 
--(CGFloat)collectionView:(JSQMessagesCollectionView *)collectionView layout:(JSQMessagesCollectionViewFlowLayout *)collectionViewLayout heightForMessageBubbleTopLabelAtIndexPath:(NSIndexPath *)indexPath {
-    return 20.0f;
-}
-
-- (NSAttributedString *)collectionView:(JSQMessagesCollectionView *)collectionView attributedTextForMessageBubbleTopLabelAtIndexPath:(NSIndexPath *)indexPath {
-    JSQMessage *message = [_messages objectAtIndex:indexPath.item];
-
-    if ([message.senderId isEqualToString:self.senderId]) {
-        return nil;
-    }
-    
-    if (indexPath.item - 1 > 0) {
-        JSQMessage *previousMessage = [_messages objectAtIndex:indexPath.item - 1];
-        if ([[previousMessage senderId] isEqualToString:message.senderId]) {
-            return nil;
-        }
-    }
-    
-    return [[NSAttributedString alloc] initWithString:message.senderDisplayName];
-}
-
 //Sets up the colors for the outgoing and incoming message bubbles.
 -(void)JSQMessageBubbleSetup {
     JSQMessagesBubbleImageFactory *bubbleFactory = [[JSQMessagesBubbleImageFactory alloc]init];
@@ -198,6 +185,7 @@ NSData *localfile;
 }
 
 -(NSMutableArray *)retrieveUsersInChatRoom {
+
     FIRDatabaseReference *userprofileRef = [[[FIRDatabase database]reference]child:@"userprofile"];
     [userprofileRef observeEventType:FIRDataEventTypeChildAdded withBlock:^(FIRDataSnapshot *snapshot) {
         
@@ -272,12 +260,15 @@ NSData *localfile;
                          style:UIAlertActionStyleDefault
                          handler:^(UIAlertAction * action)
                          {
+<<<<<<< HEAD
                              [self chooseFromGallery];
+=======
                              //Do some thing here
                              UIImage *image = [UIImage imageNamed:@"car4.jpg"];
                              localfile =  UIImageJPEGRepresentation(image, .50);
                              [self uploadPhotoToFirebase:localfile];
                              
+>>>>>>> master
                              [view dismissViewControllerAnimated:YES completion:nil];
                              
                          }];
@@ -303,7 +294,7 @@ NSData *localfile;
         NSString *fileName = @"car4.jpg";
         FIRStorage *storage = [FIRStorage storage];
         FIRStorageReference *storageRef = [storage referenceForURL:@"gs://wire-e0cde.appspot.com"];
-        FIRStorageReference *imageRef = [storageRef child:@"images/car4.jpg"];
+        FIRStorageReference *imageRef = [storageRef child:fileName];
         FIRStorageUploadTask *uploadTask = [imageRef putData:imageData metadata:nil completion:^(FIRStorageMetadata *metadata, NSError *error){
             if(error){
                 NSLog(@"ERROR&&&&&&&&&&&&&&&&= %@", error.description);
@@ -318,13 +309,48 @@ NSData *localfile;
 
                 NSLog(@"PHOTO=%@", photo.timeStamp);
                 [self savePhotoObjectToFirebaseDatabase:photo];
+    
+                
             }
         }];
     NSLog(@"************************MARK**********************");
     [uploadTask resume];
 }
 
-                                            
+-(void)savePhotoObjectToFirebaseDatabase:(Message *)photo {
+    NSLog(@"SAVE PHOTO TO DATABASE");
+    
+   //  NSString *photoName = @"car4.jpg";
+    FIRDatabaseReference *fireDatabaseRef = [[FIRDatabase database] reference];
+    FIRDatabaseReference *photosDatabaseRef = [fireDatabaseRef child:@"photos"].childByAutoId;
+    NSLog(@"PHOTO DOWNLOADURL **********************=%@", photo.downloadURL);
+    NSLog(@"PHOTO TIMESTAMP &&&&&&&&&&&&&&&&&=%@", photo.timeStamp);
+    NSDictionary *photoDict = @{@"downloadURL": photo.downloadURL, @"timestamp": photo.timeStamp};
+ 
+    
+    NSLog(@"PHOTO DICT=%@", photoDict.description);
+    [photosDatabaseRef setValue:photoDict];
+}
+
+#pragma mark Timestamp and Date Formatter Methods
+-(NSString *)createFormattedTimeStamp {
+    NSLog(@"CREATE FORMATTED TIMESTAMP");
+    NSDate *timestamp = [NSDate date];
+    NSLog(@"TIMESTAMP ##############= %@", timestamp);
+    NSString *stringTimestamp = [self formatDate:timestamp];
+    NSLog(@"STRINGTIMESTAMP################= %@", stringTimestamp);
+    return stringTimestamp;
+}
+
+
+-(NSString *)formatDate:(NSDate *)date {
+    NSLog(@"FORMAT DATE");
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc]init];
+    [dateFormatter setDateFormat:@"MM/dd/YYYY HH:mm:ss"];
+    NSString *formattedDate = [dateFormatter stringFromDate:date];
+     NSLog(@"FORMAT DATE################= %@", formattedDate);
+    return formattedDate;
+}
 
 
 - (void)takePicture{
@@ -378,59 +404,23 @@ NSData *localfile;
     _firebaseStorageRef = [_firebaseStorage referenceForURL:@"gs://wire-e0cde.appspot.com"];
 }
 
-//-(void)uploadPhotoToFirebase:(NSData *)imageData {
-//    //Create a uniqueID for the image and add it to the end of the images reference.
-//    NSString *uniqueID = [[NSUUID UUID]UUIDString];
-//    NSString *newImageReference = [NSString stringWithFormat:@"images/%@.jpg", uniqueID];
-//    //imagesRef creates a reference for the images folder and then adds a child to that folder, which will be every time a photo is taken.
-//    FIRStorageReference *imagesRef = [_firebaseStorageRef child:newImageReference];
-//    //This uploads the photo's NSData onto Firebase Storage.
-//    FIRStorageUploadTask *uploadTask = [imagesRef putData:imageData metadata:nil completion:^(FIRStorageMetadata *metadata, NSError *error) {
-//        if (error) {
-//            NSLog(@"ERROR: %@", error.description);
-//        } else {
-//            imageURL = [NSString stringWithFormat:@"%@", metadata.downloadURL];
-//        }
-//    }];
-//    [uploadTask resume];
-//}
-
-
-
-
--(void)savePhotoObjectToFirebaseDatabase:(Message *)photo {
-    NSLog(@"SAVE PHOTO TO DATABASE");
-    
-   //  NSString *photoName = @"car4.jpg";
-    FIRDatabaseReference *fireDatabaseRef = [[FIRDatabase database] reference];
-    FIRDatabaseReference *photosDatabaseRef = [fireDatabaseRef child:@"photos"].childByAutoId;
-    NSLog(@"PHOTO DOWNLOADURL **********************=%@", photo.downloadURL);
-    NSLog(@"PHOTO TIMESTAMP &&&&&&&&&&&&&&&&&=%@", photo.timeStamp);
-    NSDictionary *photoDict = @{@"downloadURL": photo.downloadURL, @"timestamp": photo.timeStamp};
- 
-    
-    NSLog(@"PHOTO DICT=%@", photoDict.description);
-    [photosDatabaseRef setValue:photoDict];
-}
-
-#pragma mark Timestamp and Date Formatter Methods
--(NSString *)createFormattedTimeStamp {
-    NSLog(@"CREATE FORMATTED TIMESTAMP");
-    NSDate *timestamp = [NSDate date];
-    NSLog(@"TIMESTAMP ##############= %@", timestamp);
-    NSString *stringTimestamp = [self formatDate:timestamp];
-    NSLog(@"STRINGTIMESTAMP################= %@", stringTimestamp);
-    return stringTimestamp;
+-(void)uploadPhotoToFirebase:(NSData *)imageData {
+    //Create a uniqueID for the image and add it to the end of the images reference.
+    NSString *uniqueID = [[NSUUID UUID]UUIDString];
+    NSString *newImageReference = [NSString stringWithFormat:@"images/%@.jpg", uniqueID];
+    //imagesRef creates a reference for the images folder and then adds a child to that folder, which will be every time a photo is taken.
+    FIRStorageReference *imagesRef = [_firebaseStorageRef child:newImageReference];
+    //This uploads the photo's NSData onto Firebase Storage.
+    FIRStorageUploadTask *uploadTask = [imagesRef putData:imageData metadata:nil completion:^(FIRStorageMetadata *metadata, NSError *error) {
+        if (error) {
+            NSLog(@"ERROR: %@", error.description);
+        } else {
+            imageURL = [NSString stringWithFormat:@"%@", metadata.downloadURL];
+        }
+    }];
+    [uploadTask resume];
 }
 
 
--(NSString *)formatDate:(NSDate *)date {
-    NSLog(@"FORMAT DATE");
-    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc]init];
-    [dateFormatter setDateFormat:@"MM/dd/YYYY HH:mm:ss"];
-    NSString *formattedDate = [dateFormatter stringFromDate:date];
-     NSLog(@"FORMAT DATE################= %@", formattedDate);
-    return formattedDate;
-}
 
 @end
