@@ -105,7 +105,6 @@ NSData *localfile;
 - (NSAttributedString *)collectionView:(JSQMessagesCollectionView *)collectionView attributedTextForMessageBubbleTopLabelAtIndexPath:(NSIndexPath *)indexPath {
     JSQMessage *message = [_messages objectAtIndex:indexPath.item];
 
-    
     if ([message.senderId isEqualToString:self.senderId]) {
         return nil;
     }
@@ -160,7 +159,6 @@ NSData *localfile;
 }
 
 -(NSMutableArray *)retrieveUsersInChatRoom {
-
     FIRDatabaseReference *userprofileRef = [[[FIRDatabase database]reference]child:@"userprofile"];
     [userprofileRef observeEventType:FIRDataEventTypeChildAdded withBlock:^(FIRDataSnapshot *snapshot) {
         
@@ -283,8 +281,6 @@ NSData *localfile;
 
                 NSLog(@"PHOTO=%@", photo.timeStamp);
                 [self savePhotoObjectToFirebaseDatabase:photo];
-    
-                
             }
         }];
     NSLog(@"************************MARK**********************");
