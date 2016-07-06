@@ -137,17 +137,20 @@ JSQMessage *message;
 
 -(void)retrieveMessagesFromFirebase {
     
-    JSQPhotoMediaItem *photoItem = [[JSQPhotoMediaItem alloc] initWithImage:resizedImg];
-    message = [[JSQMessage alloc]initWithSenderId:self.senderId senderDisplayName:self.senderDisplayName date:[NSDate date] media:photoItem];
+
 
     FIRDatabaseReference *messagesRef = [[[FIRDatabase database]reference]child:@"messages"];
     [messagesRef observeEventType:FIRDataEventTypeChildAdded withBlock:
      ^(FIRDataSnapshot *snapshot) {
          
-         
          if (snapshot.value[@"imageURL"] != nil){
-//             JSQPhotoMediaItem *photoItem = [[JSQPhotoMediaItem alloc] initWithImage:resizedImg];
-//             message = [[JSQMessage alloc]initWithSenderId:snapshot.value[@"senderId"] senderDisplayName:snapshot.value[@"senderName"] date:snapshot.value[@"timestamp"]media:photoItem];
+             [self downloadImageFromFirebaseWithAFNetworking:snapshot.value[@"imageURL"] completion:^(UIImage *messageImage) {
+                 resizedImg = messageImage;
+                 [self.collectionView reloadData];
+             }];
+             
+             JSQPhotoMediaItem *photoItem = [[JSQPhotoMediaItem alloc] initWithImage:resizedImg];
+             message = [[JSQMessage alloc]initWithSenderId:snapshot.value[@"senderId"] senderDisplayName:snapshot.value[@"senderName"] date:snapshot.value[@"timestamp"]media:photoItem];
 
          }else{
              message = [[JSQMessage alloc]initWithSenderId:snapshot.value[@"senderId"] senderDisplayName:snapshot.value[@"senderName"] date:snapshot.value[@"timestamp"] text:snapshot.value[@"text"]];}
@@ -277,6 +280,7 @@ JSQMessage *message;
     [imagePicker setDelegate:self];
     imagePicker.sourceType = UIImagePickerControllerSourceTypeCamera;
     NSLog(@"photo taking starts");
+    
 }
 
 - (void)chooseFromGallery{
@@ -294,8 +298,12 @@ JSQMessage *message;
 -(void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary<NSString *,id> *)info{
     UIImage *image = [info valueForKey:UIImagePickerControllerOriginalImage];
     resizedImg = [self reduceImageSize:image];
+    JSQPhotoMediaItem *photoItem = [[JSQPhotoMediaItem alloc] initWithImage:resizedImg];
+    message = [[JSQMessage alloc]initWithSenderId:self.senderId senderDisplayName:self.senderDisplayName date:[NSDate date] media:photoItem];
+    [_messages addObject:message];
+    
     [self dismissViewControllerAnimated:YES completion:nil];
-//    self.inputToolbar.contentView.textView.text = @"badbad";
+    [self.collectionView reloadData];
 }
 
 
