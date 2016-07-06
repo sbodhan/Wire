@@ -283,7 +283,7 @@ NSData *localfile;
         NSString *fileName = @"car4.jpg";
         FIRStorage *storage = [FIRStorage storage];
         FIRStorageReference *storageRef = [storage referenceForURL:@"gs://wire-e0cde.appspot.com"];
-        FIRStorageReference *imageRef = [storageRef child:@"images/car4.jpg"];
+        FIRStorageReference *imageRef = [storageRef child:fileName];
         FIRStorageUploadTask *uploadTask = [imageRef putData:imageData metadata:nil completion:^(FIRStorageMetadata *metadata, NSError *error){
             if(error){
                 NSLog(@"ERROR&&&&&&&&&&&&&&&&= %@", error.description);
@@ -295,17 +295,6 @@ NSData *localfile;
                 NSString *photoTimeStamp = [self createFormattedTimeStamp];
                 NSLog(@"############photoTimeStamp=%@", photoTimeStamp);
                 Message *photo = [[Message alloc]initPhotoWithDownloadURL:[NSString stringWithFormat:@"%@", metadata.downloadURL] andTimestamp:photoTimeStamp];
-            NSLog(@"PHOTO=%@", photo.timeStamp);
-            [self savePhotoObjectToFirebaseDatabase:photo];
-            
-            
-        }
-                                            }];
-    NSLog(@"************************MARK**********************");
-    [uploadTask resume];
-}
-
-                                            
 
 
 - (void)takePicture{
@@ -359,25 +348,34 @@ NSData *localfile;
     _firebaseStorageRef = [_firebaseStorage referenceForURL:@"gs://wire-e0cde.appspot.com"];
 }
 
-//-(void)uploadPhotoToFirebase:(NSData *)imageData {
-//    //Create a uniqueID for the image and add it to the end of the images reference.
-//    NSString *uniqueID = [[NSUUID UUID]UUIDString];
-//    NSString *newImageReference = [NSString stringWithFormat:@"images/%@.jpg", uniqueID];
-//    //imagesRef creates a reference for the images folder and then adds a child to that folder, which will be every time a photo is taken.
-//    FIRStorageReference *imagesRef = [_firebaseStorageRef child:newImageReference];
-//    //This uploads the photo's NSData onto Firebase Storage.
-//    FIRStorageUploadTask *uploadTask = [imagesRef putData:imageData metadata:nil completion:^(FIRStorageMetadata *metadata, NSError *error) {
-//        if (error) {
-//            NSLog(@"ERROR: %@", error.description);
-//        } else {
-//            imageURL = [NSString stringWithFormat:@"%@", metadata.downloadURL];
-//        }
-//    }];
-//    [uploadTask resume];
-//}
+-(void)uploadPhotoToFirebase:(NSData *)imageData {
+    //Create a uniqueID for the image and add it to the end of the images reference.
+    NSString *uniqueID = [[NSUUID UUID]UUIDString];
+    NSString *newImageReference = [NSString stringWithFormat:@"images/%@.jpg", uniqueID];
+    //imagesRef creates a reference for the images folder and then adds a child to that folder, which will be every time a photo is taken.
+    FIRStorageReference *imagesRef = [_firebaseStorageRef child:newImageReference];
+    //This uploads the photo's NSData onto Firebase Storage.
+    FIRStorageUploadTask *uploadTask = [imagesRef putData:imageData metadata:nil completion:^(FIRStorageMetadata *metadata, NSError *error) {
+        if (error) {
+            NSLog(@"ERROR: %@", error.description);
+        } else {
+            imageURL = [NSString stringWithFormat:@"%@", metadata.downloadURL];
+        }
+    }];
+    [uploadTask resume];
+}
 
 
 
+                NSLog(@"PHOTO=%@", photo.timeStamp);
+                [self savePhotoObjectToFirebaseDatabase:photo];
+    
+                
+            }
+        }];
+    NSLog(@"************************MARK**********************");
+    [uploadTask resume];
+}
 
 -(void)savePhotoObjectToFirebaseDatabase:(Message *)photo {
     NSLog(@"SAVE PHOTO TO DATABASE");
