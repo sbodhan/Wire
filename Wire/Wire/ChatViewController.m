@@ -71,6 +71,8 @@ JSQMessage *message;
     NSString *timestamp = [NSString stringWithFormat:@"%@", date];
     NSDictionary *message = @{@"text": text, @"senderId": senderId, @"senderName": senderDisplayName, @"timestamp":timestamp, @"ImageURL": @" "};
     [self sendMessageToFirebase:message];
+//    [[self inputToolbar] ] = @"";
+    [self scrollToBottomAnimated:YES];
     
 }
 
@@ -132,13 +134,8 @@ JSQMessage *message;
 
 
 
-
-
-
 -(void)retrieveMessagesFromFirebase {
     
-
-
     FIRDatabaseReference *messagesRef = [[[FIRDatabase database]reference]child:@"messages"];
     [messagesRef observeEventType:FIRDataEventTypeChildAdded withBlock:
      ^(FIRDataSnapshot *snapshot) {
@@ -149,11 +146,14 @@ JSQMessage *message;
                  JSQPhotoMediaItem *photoItem = [[JSQPhotoMediaItem alloc] initWithImage:resizedImg];
                  message = [[JSQMessage alloc]initWithSenderId:snapshot.value[@"senderId"] senderDisplayName:snapshot.value[@"senderName"] date:snapshot.value[@"timestamp"]media:photoItem];
                  [_messages addObject:message];
+                 
                  [self.collectionView reloadData];
              }];
          }else{
              message = [[JSQMessage alloc]initWithSenderId:snapshot.value[@"senderId"] senderDisplayName:snapshot.value[@"senderName"] date:snapshot.value[@"timestamp"] text:snapshot.value[@"text"]];
              [_messages addObject:message];
+             
+             
          }
 
          if ([message.senderId isEqualToString:self.senderId]) {
@@ -214,7 +214,6 @@ JSQMessage *message;
 //Downloads the photo using AFNetworking. returns a UIImage in the completion handler.
 -(void)downloadImageFromFirebaseWithAFNetworking:(NSString *)imageURL completion:(void(^)(UIImage *profileImage))completion {
     NSURL *url = [NSURL URLWithString:imageURL];
-    
     AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];
     manager.responseSerializer = [AFImageResponseSerializer serializer];
     [manager GET:url.absoluteString parameters:nil progress:nil success:^(NSURLSessionDataTask *task, UIImage *responseData) {
@@ -226,8 +225,7 @@ JSQMessage *message;
 }
 
 -(JSQMessagesAvatarImage *)setPlaceHolderAvatars:(NSString *)senderDisplayName {
-
- JSQMessagesAvatarImage *placeholderAvatarImage = [JSQMessagesAvatarImageFactory avatarImageWithUserInitials:[senderDisplayName substringToIndex:1] backgroundColor:[UIColor blackColor] textColor:[UIColor whiteColor] font:[UIFont systemFontOfSize:12] diameter:self.collectionView.collectionViewLayout.incomingAvatarViewSize.width];
+    JSQMessagesAvatarImage *placeholderAvatarImage = [JSQMessagesAvatarImageFactory avatarImageWithUserInitials:[senderDisplayName substringToIndex:1] backgroundColor:[UIColor blackColor] textColor:[UIColor whiteColor] font:[UIFont systemFontOfSize:12] diameter:self.collectionView.collectionViewLayout.incomingAvatarViewSize.width];
     
     return placeholderAvatarImage;
 }
@@ -326,7 +324,6 @@ JSQMessage *message;
 }
 
 -(void)uploadPhotoToFirebase:(NSData *)imageData {
-    
     //Create a uniqueID for the image and add it to the end of the images reference.
     NSString *uniqueID = [[NSUUID UUID]UUIDString];
     NSString *newImageReference = [NSString stringWithFormat:@"images/%@.jpg", uniqueID];
