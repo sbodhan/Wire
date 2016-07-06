@@ -13,6 +13,7 @@
 #import "JSQMessagesBubbleImageFactory.h"
 #import "JSQMessagesAvatarImageFactory.h"
 #import "JSQMessagesCollectionViewCell.h"
+#import "NSString+JSQMessages.h"
 #import "UIImageView+AFNetworking.h"
 #import "AFNetworking.h"
 @import FirebaseDatabase;
@@ -34,7 +35,6 @@
 
 @implementation ChatViewController
 NSData *localfile;
-
 
 - (void)viewDidLoad {
     [self setJSQsenderIdAndDisplayName];
@@ -96,6 +96,28 @@ NSData *localfile;
     }
     
     return _avatars[message.senderId];
+}
+
+-(CGFloat)collectionView:(JSQMessagesCollectionView *)collectionView layout:(JSQMessagesCollectionViewFlowLayout *)collectionViewLayout heightForMessageBubbleTopLabelAtIndexPath:(NSIndexPath *)indexPath {
+    return 20.0f;
+}
+
+- (NSAttributedString *)collectionView:(JSQMessagesCollectionView *)collectionView attributedTextForMessageBubbleTopLabelAtIndexPath:(NSIndexPath *)indexPath {
+    JSQMessage *message = [_messages objectAtIndex:indexPath.item];
+
+    
+    if ([message.senderId isEqualToString:self.senderId]) {
+        return nil;
+    }
+    
+    if (indexPath.item - 1 > 0) {
+        JSQMessage *previousMessage = [_messages objectAtIndex:indexPath.item - 1];
+        if ([[previousMessage senderId] isEqualToString:message.senderId]) {
+            return nil;
+        }
+    }
+    
+    return [[NSAttributedString alloc] initWithString:message.senderDisplayName];
 }
 
 //Sets up the colors for the outgoing and incoming message bubbles.
@@ -246,7 +268,7 @@ NSData *localfile;
         NSString *fileName = @"car4.jpg";
         FIRStorage *storage = [FIRStorage storage];
         FIRStorageReference *storageRef = [storage referenceForURL:@"gs://wire-e0cde.appspot.com"];
-        FIRStorageReference *imageRef = [storageRef child:fileName];
+        FIRStorageReference *imageRef = [storageRef child:@"images/car4.jpg"];
         FIRStorageUploadTask *uploadTask = [imageRef putData:imageData metadata:nil completion:^(FIRStorageMetadata *metadata, NSError *error){
             if(error){
                 NSLog(@"ERROR&&&&&&&&&&&&&&&&= %@", error.description);
