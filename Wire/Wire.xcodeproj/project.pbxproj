@@ -21,6 +21,7 @@
 		B8E3BAE41D219D1C0019E384 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = B8E3BAE31D219D1C0019E384 /* GoogleService-Info.plist */; };
 		C620D6E71D22B75600E607B3 /* UserProfile.m in Sources */ = {isa = PBXBuildFile; fileRef = C620D6E61D22B75600E607B3 /* UserProfile.m */; };
 		C620D6EB1D22B99000E607B3 /* Message.m in Sources */ = {isa = PBXBuildFile; fileRef = C620D6EA1D22B99000E607B3 /* Message.m */; };
+		C6B9622C1D2C08BC007F9737 /* car4.jpg in Resources */ = {isa = PBXBuildFile; fileRef = C6B9622B1D2C08BC007F9737 /* car4.jpg */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -47,6 +48,7 @@
 		C620D6E61D22B75600E607B3 /* UserProfile.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UserProfile.m; sourceTree = "<group>"; };
 		C620D6E91D22B99000E607B3 /* Message.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Message.h; sourceTree = "<group>"; };
 		C620D6EA1D22B99000E607B3 /* Message.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Message.m; sourceTree = "<group>"; };
+		C6B9622B1D2C08BC007F9737 /* car4.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = car4.jpg; sourceTree = "<group>"; };
 		CA1D7627BD91BC7373C760B4 /* Pods-Wire.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Wire.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Wire/Pods-Wire.debug.xcconfig"; sourceTree = "<group>"; };
 		E0D5DADFF0B2E435104D363C /* Pods-Wire.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Wire.release.xcconfig"; path = "Pods/Target Support Files/Pods-Wire/Pods-Wire.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -118,6 +120,7 @@
 		B8E3BACA1D2175640019E384 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				C6B9622B1D2C08BC007F9737 /* car4.jpg */,
 				B8E3BACB1D2175640019E384 /* main.m */,
 			);
 			name = "Supporting Files";
@@ -206,6 +209,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				B8E3BAE21D21758B0019E384 /* .gitignore in Resources */,
+				C6B9622C1D2C08BC007F9737 /* car4.jpg in Resources */,
 				B8E3BADA1D2175640019E384 /* LaunchScreen.storyboard in Resources */,
 				B8E3BAD71D2175640019E384 /* Assets.xcassets in Resources */,
 				B8E3BAD51D2175640019E384 /* Main.storyboard in Resources */,
