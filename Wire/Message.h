@@ -18,6 +18,11 @@
 @property (strong,nonatomic) NSString *imgDownloadURL;
 -(instancetype)initMessage:(NSString *)timeStamp :(NSString *)text :(NSString *)uid;
 
+@property (nonatomic, strong) NSString *downloadURL;
+
+-(instancetype)initPhotoWithDownloadURL:(NSString *)downloadURL andTimestamp:(NSString *)timeStamp;
+
+
 
 
 @end

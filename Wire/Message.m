@@ -21,4 +21,12 @@
     return self;
 }
 
+-(instancetype)initPhotoWithDownloadURL:(NSString *)downloadURL andTimestamp:(NSString *)timeStamp {
+    self = [super init];
+    if (self) {
+        _downloadURL = downloadURL;
+        _timeStamp = timeStamp;
+    }
+    return self;
+}
 @end
