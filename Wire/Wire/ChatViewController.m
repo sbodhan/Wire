@@ -33,7 +33,6 @@
 @property (strong, nonatomic) FIRStorage *firebaseStorage;
 
 
-
 @end
 
 @implementation ChatViewController
@@ -41,17 +40,15 @@ UIImage *resizedImg;
 NSString *imageURL;
 JSQMessage *message;
 
+
 - (void)viewDidLoad {
+    [self setJSQsenderIdAndDisplayName];
     [super viewDidLoad];
     [self retrieveUsersInChatRoom];
     [self retrieveMessagesFromFirebase];
     [self JSQMessageBubbleSetup];
     _messages = [[NSMutableArray alloc]init];
     _avatars = [[NSMutableDictionary alloc]init];
-
-    //THESE ARE ONLY FOR TESTING SO APP WON'T CRASH!
-    self.senderId = _currentUserProfile.uid;
-    self.senderDisplayName = _currentUserProfile.username;
     
     self.showTypingIndicator = !self.showTypingIndicator;
     
@@ -231,7 +228,14 @@ JSQMessage *message;
     return placeholderAvatarImage;
 }
 
-
+-(void)setJSQsenderIdAndDisplayName {
+    self.senderId = [FIRAuth auth].currentUser.uid;
+    if (_currentUserProfile == nil) {
+        self.senderDisplayName = @"User";
+    } else {
+        self.senderDisplayName = _currentUserProfile.username;
+    }
+}
 
 - (void)didPressAccessoryButton:(UIButton *)sender{
     UIAlertController * view=   [UIAlertController
