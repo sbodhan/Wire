@@ -27,8 +27,11 @@
 @property (nonatomic, strong) UserProfile *userProfile;
 @property (nonatomic, strong) NSMutableArray *userProfiles;
 @property (nonatomic, strong) NSString *profilePhotoDownloadURL;
+<<<<<<< HEAD
 @property (nonatomic, strong) FIRStorageReference *firebaseStorageRef;
 @property (nonatomic, strong) FIRStorage *firebaseStorage;
+=======
+>>>>>>> master
 
 @end
 
@@ -44,7 +47,15 @@ NSData *localfile;
     [self JSQMessageBubbleSetup];
     _messages = [[NSMutableArray alloc]init];
     _avatars = [[NSMutableDictionary alloc]init];
+<<<<<<< HEAD
+
+    //THESE ARE ONLY FOR TESTING SO APP WON'T CRASH!
+    self.senderId = _currentUserProfile.uid;
+    self.senderDisplayName = _currentUserProfile.username;
+    [self firebaseSetup];
+=======
     
+>>>>>>> master
 }
 
 - (void)didReceiveMemoryWarning {
@@ -88,6 +99,13 @@ NSData *localfile;
 
 -(id<JSQMessageAvatarImageDataSource>)collectionView:(JSQMessagesCollectionView *)collectionView avatarImageDataForItemAtIndexPath:(NSIndexPath *)indexPath {
 
+<<<<<<< HEAD
+//    JSQMessage *message = [_messages objectAtIndex:indexPath.row];
+//
+//    return _avatars[message.senderId];
+    
+    return nil;
+=======
     JSQMessage *message = [_messages objectAtIndex:indexPath.row];
     
     if (_avatars[message.senderId] == nil) {
@@ -96,6 +114,7 @@ NSData *localfile;
     }
     
     return _avatars[message.senderId];
+>>>>>>> master
 }
 
 //Sets up the colors for the outgoing and incoming message bubbles.
@@ -174,6 +193,12 @@ NSData *localfile;
     }];
 }
 
+<<<<<<< HEAD
+-(void)firebaseSetup{
+    _firebaseStorage = [FIRStorage storage];
+    _firebaseStorageRef = [_firebaseStorage referenceForURL:@"gs://wire-e0cde.appspot.com"];
+    NSLog(@"FIREBASE STORAGE");
+=======
 //Downloads the photo using AFNetworking. returns a UIImage in the completion handler.
 -(void)downloadImageFromFirebaseWithAFNetworking:(NSString *)imageURL completion:(void(^)(UIImage *profileImage))completion {
     NSURL *url = [NSURL URLWithString:imageURL];
@@ -202,6 +227,7 @@ NSData *localfile;
     } else {
         self.senderDisplayName = _currentUserProfile.username;
     }
+>>>>>>> master
 }
 
 - (void)didPressAccessoryButton:(UIButton *)sender{
