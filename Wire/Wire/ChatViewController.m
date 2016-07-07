@@ -164,17 +164,19 @@ NSData *localfile;
                  message = [[JSQMessage alloc]initWithSenderId:snapshot.value[@"senderId"] senderDisplayName:snapshot.value[@"senderName"] date:snapshot.value[@"timestamp"]media:photoItem];
                  [_messages addObject:message];
                  
-                 
                  [self.collectionView reloadData];
              }];
              
-         }else{
+         } else {
              message = [[JSQMessage alloc]initWithSenderId:snapshot.value[@"senderId"] senderDisplayName:snapshot.value[@"senderName"] date:snapshot.value[@"timestamp"] text:snapshot.value[@"text"]];
              [_messages addObject:message];
              
          }
 
          if ([message.senderId isEqualToString:self.senderId]) {
+             
+             NSLog(@"CURRENT USER PROFILE DOWNLOAD URL: %@", _currentUserProfile.profileImageDownloadURL);
+             
              [self downloadImageFromFirebaseWithAFNetworking:_currentUserProfile.profileImageDownloadURL completion:^(UIImage *profileImage) {
                  [self setUpAvatarImages:message.senderId image:profileImage incoming:FALSE];
                  [self.collectionView reloadData];

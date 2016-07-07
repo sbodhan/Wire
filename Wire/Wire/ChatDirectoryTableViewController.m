@@ -33,6 +33,7 @@
     [self listenForChangesInUserProfile];
     [self getCurrentUserProfileFromFirebase];
     [super viewDidLoad];
+        
 }
 
 - (void)didReceiveMemoryWarning {
@@ -64,6 +65,8 @@
         NSLog(@"SNAPSHOT %@", snapshot);
         _currentUserProfileKey = snapshot.key;
         _currentUser = [[UserProfile alloc]initUserProfileWithEmail:snapshot.value[@"email"] username:snapshot.value[@"username"] uid:snapshot.value[@"userId"]];
+        _currentUser.profileImageDownloadURL = snapshot.value[@"profilePhotoDownloadURL"];
+        NSLog(@"DOWNLOADED: %@", snapshot.value[@"profilePhotoDownloadURL"]);
         _currentUser.profileImage = [UIImage imageWithData:[NSData dataWithContentsOfURL:[NSURL URLWithString:snapshot.value[@"profilePhotoDownloadURL"]]]];
         dispatch_async(dispatch_get_main_queue(), ^{
             [_currentUserProfilePhoto setImage:_currentUser.profileImage];
@@ -75,10 +78,12 @@
 -(void)listenForChangesInUserProfile {
     FIRDatabaseReference *UserProfileRef = [[[FIRDatabase database]reference]child:@"userprofile"];
     FIRDatabaseQuery *currentUserProfileChangedQuery = [[UserProfileRef queryOrderedByChild:@"userId"] queryEqualToValue:[FIRAuth auth].currentUser.uid];
-    
+
     [currentUserProfileChangedQuery observeEventType:FIRDataEventTypeChildChanged withBlock:^(FIRDataSnapshot *snapshot) {
         _currentUser = [[UserProfile alloc]initUserProfileWithEmail:snapshot.value[@"email"] username:snapshot.value[@"username"] uid:snapshot.value[@"userId"]];
+        _currentUser.profileImageDownloadURL = snapshot.value[@"profilePhotoDownloadURL"];
         _currentUser.profileImage = [UIImage imageWithData:[NSData dataWithContentsOfURL:[NSURL URLWithString:snapshot.value[@"profilePhotoDownloadURL"]]]];
+        NSLog(@"_current user URL: %@", _currentUser.profileImageDownloadURL);
         dispatch_async(dispatch_get_main_queue(), ^{
             [_currentUserProfilePhoto setImage:_currentUser.profileImage];
             [_usernameLabel setText:[NSString stringWithFormat:@"Hello, %@!", _currentUser.username]];
@@ -86,12 +91,6 @@
     }];
     
 }
-
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    ChatViewController *destVC = [segue destinationViewController];
-    destVC.currentUserProfile = _currentUser;
-}
-
     -(void)presentCamera {
         _imagePicker = [[UIImagePickerController alloc] init];
         [_imagePicker setDelegate:self];
@@ -154,6 +153,12 @@
 
     [firebaseRef updateChildValues:childUpdates];
 
+}
+
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    NSLog(@"DOWNLOAD URL PREPARE FOR SEGUE: %@", _currentUser.profileImageDownloadURL);
+    ChatViewController *destVC = [segue destinationViewController];
+    destVC.currentUserProfile = _currentUser;
 }
 
 - (IBAction)profilePhotoSelected:(id)sender {
