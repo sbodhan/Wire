@@ -8,14 +8,13 @@
 
 #import "ChatViewController.h"
 #import "JSQMessage.h"
-
 #import "JSQPhotoMediaItem.h"
 #import "JSQMessagesBubbleImage.h"
 #import "JSQMessagesAvatarImage.h"
 #import "JSQMessagesBubbleImageFactory.h"
 #import "JSQMessagesAvatarImageFactory.h"
-@import FirebaseStorage;
 #import "JSQMessagesCollectionViewCell.h"
+#import "NSString+JSQMessages.h"
 #import "UIImageView+AFNetworking.h"
 #import "AFNetworking.h"
 @import FirebaseDatabase;
@@ -33,7 +32,6 @@
 @property (strong, nonatomic) FIRStorageReference *firebaseStorageRef;
 @property (strong, nonatomic) FIRStorage *firebaseStorage;
 
-
 @end
 
 @implementation ChatViewController
@@ -41,7 +39,6 @@ UIImage *resizedImg;
 NSString *imageURL;
 JSQMessage *message;
 NSData *localfile;
-
 
 - (void)viewDidLoad {
     [self setJSQsenderIdAndDisplayName];
@@ -73,7 +70,6 @@ NSData *localfile;
     NSString *timestamp = [NSString stringWithFormat:@"%@", date];
     NSDictionary *message = @{@"text": text, @"senderId": senderId, @"senderName": senderDisplayName, @"timestamp":timestamp, @"ImageURL": @" "};
     [self sendMessageToFirebase:message];
-//    [[self inputToolbar] ] = @"";
     [self scrollToBottomAnimated:YES];
     
 }
@@ -114,6 +110,26 @@ NSData *localfile;
     return _avatars[message.senderId];
 }
 
+-(CGFloat)collectionView:(JSQMessagesCollectionView *)collectionView layout:(JSQMessagesCollectionViewFlowLayout *)collectionViewLayout heightForMessageBubbleTopLabelAtIndexPath:(NSIndexPath *)indexPath {
+    return 20.0f;
+}
+
+- (NSAttributedString *)collectionView:(JSQMessagesCollectionView *)collectionView attributedTextForMessageBubbleTopLabelAtIndexPath:(NSIndexPath *)indexPath {
+    JSQMessage *message = [_messages objectAtIndex:indexPath.item];
+
+    if ([message.senderId isEqualToString:self.senderId]) {
+        return nil;
+    }
+    
+    if (indexPath.item - 1 > 0) {
+        JSQMessage *previousMessage = [_messages objectAtIndex:indexPath.item - 1];
+        if ([[previousMessage senderId] isEqualToString:message.senderId]) {
+            return nil;
+        }
+    }
+    return [[NSAttributedString alloc] initWithString:message.senderDisplayName];
+}
+
 //Sets up the colors for the outgoing and incoming message bubbles.
 -(void)JSQMessageBubbleSetup {
     JSQMessagesBubbleImageFactory *bubbleFactory = [[JSQMessagesBubbleImageFactory alloc]init];
@@ -135,7 +151,6 @@ NSData *localfile;
 }
 
 
-
 -(void)retrieveMessagesFromFirebase {
     
     FIRDatabaseReference *messagesRef = [[[FIRDatabase database]reference]child:@"messages"];
@@ -151,14 +166,17 @@ NSData *localfile;
                  
                  [self.collectionView reloadData];
              }];
-         }else{
+             
+         } else {
              message = [[JSQMessage alloc]initWithSenderId:snapshot.value[@"senderId"] senderDisplayName:snapshot.value[@"senderName"] date:snapshot.value[@"timestamp"] text:snapshot.value[@"text"]];
              [_messages addObject:message];
-             
              
          }
 
          if ([message.senderId isEqualToString:self.senderId]) {
+             
+             NSLog(@"CURRENT USER PROFILE DOWNLOAD URL: %@", _currentUserProfile.profileImageDownloadURL);
+             
              [self downloadImageFromFirebaseWithAFNetworking:_currentUserProfile.profileImageDownloadURL completion:^(UIImage *profileImage) {
                  [self setUpAvatarImages:message.senderId image:profileImage incoming:FALSE];
                  [self.collectionView reloadData];
@@ -177,7 +195,6 @@ NSData *localfile;
 }
 
 -(NSMutableArray *)retrieveUsersInChatRoom {
-
     FIRDatabaseReference *userprofileRef = [[[FIRDatabase database]reference]child:@"userprofile"];
     [userprofileRef observeEventType:FIRDataEventTypeChildAdded withBlock:^(FIRDataSnapshot *snapshot) {
         
@@ -280,7 +297,6 @@ NSData *localfile;
 -(void)uploadPhotoToFirebase:(NSData *)imageData{
     NSLog(@"UPLOAD PHOTO TO FIREBASE");
     
-        NSString *fileName = @"car4.jpg";
         FIRStorage *storage = [FIRStorage storage];
         FIRStorageReference *storageRef = [storage referenceForURL:@"gs://wire-e0cde.appspot.com"];
         FIRStorageReference *imageRef = [storageRef child:@"images/car4.jpg"];
@@ -295,12 +311,11 @@ NSData *localfile;
                 NSString *photoTimeStamp = [self createFormattedTimeStamp];
                 NSLog(@"############photoTimeStamp=%@", photoTimeStamp);
                 Message *photo = [[Message alloc]initPhotoWithDownloadURL:[NSString stringWithFormat:@"%@", metadata.downloadURL] andTimestamp:photoTimeStamp];
-            NSLog(@"PHOTO=%@", photo.timeStamp);
-            [self savePhotoObjectToFirebaseDatabase:photo];
-            
-            
-        }
-                                            }];
+
+                NSLog(@"PHOTO=%@", photo.timeStamp);
+                [self savePhotoObjectToFirebaseDatabase:photo];
+            }
+        }];
     NSLog(@"************************MARK**********************");
     [uploadTask resume];
 }

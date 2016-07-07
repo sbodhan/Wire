@@ -1,5 +1,5 @@
 //
-//  ChatDirectoryTableViewController.h
+//  ChatProfileVC.h
 //  Wire
 //
 //  Created by DetroitLabs on 6/27/16.
@@ -9,6 +9,6 @@
 #import <UIKit/UIKit.h>
 #import "UserProfile.h"
 
-@interface ChatDirectoryTableViewController : UIViewController
+@interface ChatProfileVC : UIViewController
 
 @end

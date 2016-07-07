@@ -16,15 +16,10 @@
     _email = email;
     _username = username;
     _uid = uid;
-    _profileImageDownloadURL = @"https://firebasestorage.googleapis.com/v0/b/wire-e0cde.appspot.com/o/cat.png?alt=media&token=6c248651-480b-41dc-9bc8-3d43c52d79fe";
+    
     }
     
     return self;
 }
 
 @end
-
-//Firebase Storage URL for the default user image.
-//    https://firebasestorage.googleapis.com/v0/b/wire-e0cde.appspot.com/o/default_user.png?alt=media&token=d351d796-3f49-4f8f-8ca8-7d)1cd17f510
-
-//Cat Image URL: "https://firebasestorage.googleapis.com/v0/b/wire-e0cde.appspot.com/o/default_user.png?alt=media&token=6c248651-480b-41dc-9bc8-3d43c52d79fe"

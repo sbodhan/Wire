@@ -96,10 +96,10 @@
             </objects>
             <point key="canvasLocation" x="553" y="302"/>
         </scene>
-        <!--Chat Directory Table View Controller-->
+        <!--Chat ProfileVC-->
         <scene sceneID="TXl-hk-RJp">
             <objects>
-                <viewController id="QLi-6n-Ams" customClass="ChatDirectoryTableViewController" sceneMemberID="viewController">
+                <viewController id="QLi-6n-Ams" customClass="ChatProfileVC" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="PlA-rB-eWb"/>
                         <viewControllerLayoutGuide type="bottom" id="WJ8-UW-fAq"/>
@@ -108,35 +108,50 @@
                         <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="71" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="Adu-b2-1Dt">
-                                <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
-                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                <prototypes>
-                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" accessoryType="disclosureIndicator" indentationWidth="10" reuseIdentifier="ChatDirectoryCell" rowHeight="71" id="caH-qZ-PY1">
-                                        <rect key="frame" x="0.0" y="92" width="320" height="71"/>
-                                        <autoresizingMask key="autoresizingMask"/>
-                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="caH-qZ-PY1" id="EtD-IC-9VR">
-                                            <rect key="frame" x="0.0" y="0.0" width="287" height="70.5"/>
-                                            <autoresizingMask key="autoresizingMask"/>
-                                        </tableViewCellContentView>
-                                        <color key="backgroundColor" red="0.0" green="1" blue="0.50196081400000003" alpha="1" colorSpace="calibratedRGB"/>
-                                        <connections>
-                                            <segue destination="i5Z-ep-M6M" kind="push" id="WJm-n5-T2N"/>
-                                        </connections>
-                                    </tableViewCell>
-                                </prototypes>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="XhM-zb-Qhw">
+                                <rect key="frame" x="87" y="409" width="147" height="93"/>
+                                <color key="backgroundColor" red="0.0" green="0.51121367520000005" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="93" id="FwZ-Xb-mmj"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="system" weight="heavy" pointSize="15"/>
+                                <state key="normal" title="Go Chat!">
+                                    <color key="titleColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                </state>
                                 <connections>
-                                    <outlet property="dataSource" destination="QLi-6n-Ams" id="clz-Gx-uP5"/>
-                                    <outlet property="delegate" destination="QLi-6n-Ams" id="nQq-2f-Epf"/>
+                                    <segue destination="i5Z-ep-M6M" kind="push" id="6cL-fc-DQK"/>
                                 </connections>
-                            </tableView>
+                            </button>
+                            <imageView contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="Erm-qV-wcC">
+                                <rect key="frame" x="45" y="72" width="230" height="230"/>
+                                <gestureRecognizers/>
+                                <connections>
+                                    <outletCollection property="gestureRecognizers" destination="ic1-s2-VDt" appends="YES" id="ycZ-Bt-fFh"/>
+                                </connections>
+                            </imageView>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="uG4-He-e89">
+                                <rect key="frame" x="45" y="310" width="230" height="37"/>
+                                <color key="backgroundColor" red="0.0" green="0.51121367520000005" blue="1" alpha="0.77400323280000005" colorSpace="calibratedRGB"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="37" id="5L6-iX-lZM"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                <nil key="highlightedColor"/>
+                            </label>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
-                            <constraint firstItem="Adu-b2-1Dt" firstAttribute="leading" secondItem="Z9q-HY-NE8" secondAttribute="leading" id="GNN-ZB-SCW"/>
-                            <constraint firstItem="Adu-b2-1Dt" firstAttribute="top" secondItem="Z9q-HY-NE8" secondAttribute="top" id="UBD-gP-esq"/>
-                            <constraint firstItem="Adu-b2-1Dt" firstAttribute="bottom" secondItem="WJ8-UW-fAq" secondAttribute="top" id="gER-Aq-ZZO"/>
-                            <constraint firstAttribute="trailing" secondItem="Adu-b2-1Dt" secondAttribute="trailing" id="q9U-eJ-3yj"/>
+                            <constraint firstItem="Erm-qV-wcC" firstAttribute="leading" secondItem="uG4-He-e89" secondAttribute="leading" id="Aa3-Vk-5Qt"/>
+                            <constraint firstItem="uG4-He-e89" firstAttribute="centerX" secondItem="XhM-zb-Qhw" secondAttribute="centerX" id="HDT-7m-IMn"/>
+                            <constraint firstItem="XhM-zb-Qhw" firstAttribute="leading" secondItem="Z9q-HY-NE8" secondAttribute="leadingMargin" constant="71" id="Nho-UI-ScG"/>
+                            <constraint firstItem="XhM-zb-Qhw" firstAttribute="top" secondItem="uG4-He-e89" secondAttribute="bottom" constant="62" id="Nzp-3h-iBs"/>
+                            <constraint firstItem="WJ8-UW-fAq" firstAttribute="top" secondItem="XhM-zb-Qhw" secondAttribute="bottom" constant="66" id="Om7-9l-9sD"/>
+                            <constraint firstItem="Erm-qV-wcC" firstAttribute="trailing" secondItem="uG4-He-e89" secondAttribute="trailing" id="R01-AS-aiM"/>
+                            <constraint firstItem="Erm-qV-wcC" firstAttribute="centerX" secondItem="Z9q-HY-NE8" secondAttribute="centerX" id="R0u-Us-br4"/>
+                            <constraint firstItem="Erm-qV-wcC" firstAttribute="top" secondItem="PlA-rB-eWb" secondAttribute="bottom" constant="8" symbolic="YES" id="UIm-pm-jgp"/>
+                            <constraint firstItem="uG4-He-e89" firstAttribute="top" secondItem="Erm-qV-wcC" secondAttribute="bottom" constant="8" symbolic="YES" id="kfy-57-HQc"/>
+                            <constraint firstItem="Erm-qV-wcC" firstAttribute="leading" secondItem="Z9q-HY-NE8" secondAttribute="leadingMargin" constant="29" id="xF2-FR-0CC"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" id="rYw-LY-0kZ">
@@ -146,8 +161,17 @@
                             </connections>
                         </barButtonItem>
                     </navigationItem>
+                    <connections>
+                        <outlet property="currentUserProfilePhoto" destination="Erm-qV-wcC" id="dDF-Dq-6Xq"/>
+                        <outlet property="usernameLabel" destination="uG4-He-e89" id="IPy-ja-WHR"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="3Ee-eC-xhb" userLabel="First Responder" sceneMemberID="firstResponder"/>
+                <tapGestureRecognizer id="ic1-s2-VDt">
+                    <connections>
+                        <action selector="profilePhotoSelected:" destination="QLi-6n-Ams" id="QUh-lY-Feq"/>
+                    </connections>
+                </tapGestureRecognizer>
             </objects>
             <point key="canvasLocation" x="949" y="945"/>
         </scene>
@@ -289,7 +313,7 @@
         <!--Navigation Controller-->
         <scene sceneID="cOY-cH-Lfa">
             <objects>
-                <navigationController storyboardIdentifier="ChatDirectoryNavController" automaticallyAdjustsScrollViewInsets="NO" useStoryboardIdentifierAsRestorationIdentifier="YES" id="Vjh-k3-Izl" sceneMemberID="viewController">
+                <navigationController storyboardIdentifier="ChatProfileNavController" automaticallyAdjustsScrollViewInsets="NO" useStoryboardIdentifierAsRestorationIdentifier="YES" id="Vjh-k3-Izl" sceneMemberID="viewController">
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="ysm-Cj-8Nv">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
