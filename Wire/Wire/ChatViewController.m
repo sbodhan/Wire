@@ -7,14 +7,17 @@
 //
 
 #import "ChatViewController.h"
-#import "JSQMessage.h"
 
+#import "FullPreviewViewController.h"
+
+#import "JSQMessage.h"
 #import "JSQPhotoMediaItem.h"
 #import "JSQMessagesBubbleImage.h"
 #import "JSQMessagesAvatarImage.h"
 #import "JSQMessagesBubbleImageFactory.h"
 #import "JSQMessagesAvatarImageFactory.h"
 #import "JSQMessagesCollectionViewCell.h"
+#import "NSString+JSQMessages.h"
 #import "UIImageView+AFNetworking.h"
 #import "AFNetworking.h"
 @import FirebaseStorage;
@@ -23,6 +26,10 @@
 @import FirebaseStorage;
 
 @interface ChatViewController ()
+@property (nonatomic, strong) UIImage *avatarImageToPass;
+@property (nonatomic, strong) NSURL *avatarImageURL;
+@property (nonatomic, strong) UserProfile *userProfileToPass;
+
 @property (nonatomic, strong) NSMutableArray *messages;
 @property (nonatomic, strong) JSQMessagesBubbleImage *outgoingBubbleImage;
 @property (nonatomic, strong) JSQMessagesBubbleImage *incomingBubbleImage;
@@ -33,14 +40,12 @@
 @property (strong, nonatomic) FIRStorageReference *firebaseStorageRef;
 @property (strong, nonatomic) FIRStorage *firebaseStorage;
 
-
 @end
 
 @implementation ChatViewController
 UIImage *resizedImg;
 NSString *imageURL;
 JSQMessage *message;
-
 
 
 - (void)viewDidLoad {
@@ -68,9 +73,14 @@ JSQMessage *message;
     [self firebaseSetUp];
     //send text messsage
     NSString *timestamp = [NSString stringWithFormat:@"%@", date];
+<<<<<<< HEAD
     NSDictionary *messageDictionary = @{@"text": text, @"senderId": senderId, @"senderName": senderDisplayName, @"timestamp":timestamp};
     [self sendMessageToFirebase:messageDictionary];
     
+=======
+    NSDictionary *message = @{@"text": text, @"senderId": senderId, @"senderName": senderDisplayName, @"timestamp":timestamp, @"ImageURL": @" "};
+    [self sendMessageToFirebase:message];
+>>>>>>> 20ec48c1d13cf00d6889d895266a286109eaf979
     [self scrollToBottomAnimated:YES];
     
 }
@@ -111,6 +121,26 @@ JSQMessage *message;
     return _avatars[message.senderId];
 }
 
+-(CGFloat)collectionView:(JSQMessagesCollectionView *)collectionView layout:(JSQMessagesCollectionViewFlowLayout *)collectionViewLayout heightForMessageBubbleTopLabelAtIndexPath:(NSIndexPath *)indexPath {
+    return 20.0f;
+}
+
+- (NSAttributedString *)collectionView:(JSQMessagesCollectionView *)collectionView attributedTextForMessageBubbleTopLabelAtIndexPath:(NSIndexPath *)indexPath {
+    JSQMessage *message = [_messages objectAtIndex:indexPath.item];
+
+    if ([message.senderId isEqualToString:self.senderId]) {
+        return nil;
+    }
+    
+    if (indexPath.item - 1 > 0) {
+        JSQMessage *previousMessage = [_messages objectAtIndex:indexPath.item - 1];
+        if ([[previousMessage senderId] isEqualToString:message.senderId]) {
+            return nil;
+        }
+    }
+    return [[NSAttributedString alloc] initWithString:message.senderDisplayName];
+}
+
 //Sets up the colors for the outgoing and incoming message bubbles.
 -(void)JSQMessageBubbleSetup {
     JSQMessagesBubbleImageFactory *bubbleFactory = [[JSQMessagesBubbleImageFactory alloc]init];
@@ -124,13 +154,71 @@ JSQMessage *message;
     return avatar;
 }
 
+//***************************************************************************************************************************
+
+/*
+ Detects if the avatar image is tapped. This grabs the message at that indexPath,
+ uses the senderId and passed it to the 'getCurrentUserProfileFromFirebase' function
+ to get the UserProfile to then gain access to the profile photo.
+ Once it does that then we pass the photo to the FullPreviewVC and display the profile
+ photo in a full screen mode.
+*/
+- (void)collectionView:(JSQMessagesCollectionView *)collectionView didTapAvatarImageView:(UIImageView *)avatarImageView atIndexPath:(NSIndexPath *)indexPath {
+    
+    JSQMessage *message = _messages[indexPath.row];
+
+    [self getCurrentUserProfileFromFirebase:message.senderId completion:^(UserProfile *userProfile) {
+        _avatarImageToPass = userProfile.profileImage;
+        [self performSegueWithIdentifier:@"FullPreviewVCSegue" sender:self];
+    }];
+
+}
+
+- (void)collectionView:(JSQMessagesCollectionView *)collectionView didTapMessageBubbleAtIndexPath:(NSIndexPath *)indexPath {
+    NSLog(@"Tapped message bubble!");
+}
+
+
+/*
+ Accepts the message's senderId and uses it to retrieve the UserProfile for that sender.
+ With this UserProfile we can gain access to the profilePhotoDownloadURL and
+ get the profile photo to then pass to the next screen.
+ */
+-(void)getCurrentUserProfileFromFirebase:(NSString *)messageSenderId completion:(void(^)(UserProfile *userProfile))completion {
+    
+    FIRDatabaseReference *userProfileRef = [[[FIRDatabase database]reference]child:@"userprofile"];
+    FIRDatabaseQuery *userProfileToPassQuery = [[userProfileRef queryOrderedByChild:@"userId"] queryEqualToValue:messageSenderId];
+    [userProfileToPassQuery observeEventType:FIRDataEventTypeChildAdded withBlock:^(FIRDataSnapshot *snapshot) {
+        
+        _userProfileToPass = [[UserProfile alloc]initUserProfileWithEmail:snapshot.value[@"email"] username:snapshot.value[@"username"] uid:snapshot.value[@"userId"]];
+
+        _userProfileToPass.profileImageDownloadURL = snapshot.value[@"profilePhotoDownloadURL"];
+        _userProfileToPass.profileImage = [UIImage imageWithData:[NSData dataWithContentsOfURL:[NSURL URLWithString:snapshot.value[@"profilePhotoDownloadURL"]]]];
+        
+        completion(_userProfileToPass);
+        
+    }];
+}
+
+
+-(void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    if ([segue.identifier isEqualToString:@"FullPreviewVCSegue"]) {
+        FullPreviewViewController *destVC = [segue destinationViewController];
+        destVC.imagePassed = _avatarImageToPass;
+    }
+}
+
+
+
+//***************************************************************************************************************************
+
+
 #pragma mark Firebase Methods
 
 -(void)sendMessageToFirebase:(NSDictionary *)message {
     FIRDatabaseReference *messagesRef = [[[[FIRDatabase database]reference]child:@"messages"]childByAutoId];
     [messagesRef setValue:message];
 }
-
 
 
 -(void)retrieveMessagesFromFirebase {
@@ -148,14 +236,17 @@ JSQMessage *message;
                  
                  [self.collectionView reloadData];
              }];
-         }else{
+             
+         } else {
              message = [[JSQMessage alloc]initWithSenderId:snapshot.value[@"senderId"] senderDisplayName:snapshot.value[@"senderName"] date:snapshot.value[@"timestamp"] text:snapshot.value[@"text"]];
              [_messages addObject:message];
-             
              
          }
          
          if ([message.senderId isEqualToString:self.senderId]) {
+             
+             NSLog(@"CURRENT USER PROFILE DOWNLOAD URL: %@", _currentUserProfile.profileImageDownloadURL);
+             
              [self downloadImageFromFirebaseWithAFNetworking:_currentUserProfile.profileImageDownloadURL completion:^(UIImage *profileImage) {
                  [self setUpAvatarImages:message.senderId image:profileImage incoming:FALSE];
                  [self.collectionView reloadData];
@@ -174,7 +265,10 @@ JSQMessage *message;
 }
 
 -(NSMutableArray *)retrieveUsersInChatRoom {
+<<<<<<< HEAD
     
+=======
+>>>>>>> 20ec48c1d13cf00d6889d895266a286109eaf979
     FIRDatabaseReference *userprofileRef = [[[FIRDatabase database]reference]child:@"userprofile"];
     [userprofileRef observeEventType:FIRDataEventTypeChildAdded withBlock:^(FIRDataSnapshot *snapshot) {
         
@@ -274,6 +368,7 @@ JSQMessage *message;
     [self presentViewController:view animated:YES completion:nil];
 }
 
+<<<<<<< HEAD
 -(NSString *)uploadPhotoToFirebase:(NSData *)imageData{
     NSString *uniqueID = [[NSUUID UUID]UUIDString];
     NSString *newImageReference = [NSString stringWithFormat:@"images/%@.jpg", uniqueID];
@@ -294,6 +389,31 @@ JSQMessage *message;
             url = [NSString stringWithFormat:@"%@",photo.downloadURL];
         }
     }];
+=======
+-(void)uploadPhotoToFirebase:(NSData *)imageData{
+    NSLog(@"UPLOAD PHOTO TO FIREBASE");
+    
+        FIRStorage *storage = [FIRStorage storage];
+        FIRStorageReference *storageRef = [storage referenceForURL:@"gs://wire-e0cde.appspot.com"];
+        FIRStorageReference *imageRef = [storageRef child:@"images/car4.jpg"];
+        FIRStorageUploadTask *uploadTask = [imageRef putData:imageData metadata:nil completion:^(FIRStorageMetadata *metadata, NSError *error){
+            if(error){
+                NSLog(@"ERROR&&&&&&&&&&&&&&&&= %@", error.description);
+            }
+    
+            else{
+                NSURL *downloadURL = metadata.downloadURL;
+                NSLog(@"DOWNLOADURL &&&&&&&&&&&&&&=%@", downloadURL);
+                NSString *photoTimeStamp = [self createFormattedTimeStamp];
+                NSLog(@"############photoTimeStamp=%@", photoTimeStamp);
+                Message *photo = [[Message alloc]initPhotoWithDownloadURL:[NSString stringWithFormat:@"%@", metadata.downloadURL] andTimestamp:photoTimeStamp];
+
+                NSLog(@"PHOTO=%@", photo.timeStamp);
+                [self savePhotoObjectToFirebaseDatabase:photo];
+            }
+        }];
+    NSLog(@"************************MARK**********************");
+>>>>>>> 20ec48c1d13cf00d6889d895266a286109eaf979
     [uploadTask resume];
     return url;
 }
