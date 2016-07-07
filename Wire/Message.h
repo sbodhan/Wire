@@ -8,21 +8,12 @@
 
 #import <Foundation/Foundation.h>
 #import "JSQMessagesViewController.h"
+#import "JSQMessagesAvatarImage.h"
+#import "JSQMessage.h"
 
-@interface Message : NSObject
+@interface Message : JSQMessage
 
-@property (strong, nonatomic) NSString *timeStamp;
-@property (strong,nonatomic) NSString *text;
-@property (strong,nonatomic) NSString *sender;
-@property (strong,nonatomic) NSString *uid;
-@property (strong,nonatomic) NSString *imgDownloadURL;
--(instancetype)initMessage:(NSString *)timeStamp :(NSString *)text :(NSString *)uid;
-
-@property (nonatomic, strong) NSString *downloadURL;
-
--(instancetype)initPhotoWithDownloadURL:(NSString *)downloadURL andTimestamp:(NSString *)timeStamp;
-
-
+@property (strong, nonatomic) JSQMessagesAvatarImage *avatarImage;
 
 
 @end
