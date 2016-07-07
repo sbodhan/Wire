@@ -47,7 +47,6 @@ UIImage *resizedImg;
 NSString *imageURL;
 JSQMessage *message;
 
-
 - (void)viewDidLoad {
     [self setJSQsenderIdAndDisplayName];
     [super viewDidLoad];
@@ -73,14 +72,9 @@ JSQMessage *message;
     [self firebaseSetUp];
     //send text messsage
     NSString *timestamp = [NSString stringWithFormat:@"%@", date];
-<<<<<<< HEAD
     NSDictionary *messageDictionary = @{@"text": text, @"senderId": senderId, @"senderName": senderDisplayName, @"timestamp":timestamp};
     [self sendMessageToFirebase:messageDictionary];
     
-=======
-    NSDictionary *message = @{@"text": text, @"senderId": senderId, @"senderName": senderDisplayName, @"timestamp":timestamp, @"ImageURL": @" "};
-    [self sendMessageToFirebase:message];
->>>>>>> 20ec48c1d13cf00d6889d895266a286109eaf979
     [self scrollToBottomAnimated:YES];
     
 }
@@ -265,10 +259,6 @@ JSQMessage *message;
 }
 
 -(NSMutableArray *)retrieveUsersInChatRoom {
-<<<<<<< HEAD
-    
-=======
->>>>>>> 20ec48c1d13cf00d6889d895266a286109eaf979
     FIRDatabaseReference *userprofileRef = [[[FIRDatabase database]reference]child:@"userprofile"];
     [userprofileRef observeEventType:FIRDataEventTypeChildAdded withBlock:^(FIRDataSnapshot *snapshot) {
         
@@ -368,7 +358,6 @@ JSQMessage *message;
     [self presentViewController:view animated:YES completion:nil];
 }
 
-<<<<<<< HEAD
 -(NSString *)uploadPhotoToFirebase:(NSData *)imageData{
     NSString *uniqueID = [[NSUUID UUID]UUIDString];
     NSString *newImageReference = [NSString stringWithFormat:@"images/%@.jpg", uniqueID];
@@ -389,31 +378,6 @@ JSQMessage *message;
             url = [NSString stringWithFormat:@"%@",photo.downloadURL];
         }
     }];
-=======
--(void)uploadPhotoToFirebase:(NSData *)imageData{
-    NSLog(@"UPLOAD PHOTO TO FIREBASE");
-    
-        FIRStorage *storage = [FIRStorage storage];
-        FIRStorageReference *storageRef = [storage referenceForURL:@"gs://wire-e0cde.appspot.com"];
-        FIRStorageReference *imageRef = [storageRef child:@"images/car4.jpg"];
-        FIRStorageUploadTask *uploadTask = [imageRef putData:imageData metadata:nil completion:^(FIRStorageMetadata *metadata, NSError *error){
-            if(error){
-                NSLog(@"ERROR&&&&&&&&&&&&&&&&= %@", error.description);
-            }
-    
-            else{
-                NSURL *downloadURL = metadata.downloadURL;
-                NSLog(@"DOWNLOADURL &&&&&&&&&&&&&&=%@", downloadURL);
-                NSString *photoTimeStamp = [self createFormattedTimeStamp];
-                NSLog(@"############photoTimeStamp=%@", photoTimeStamp);
-                Message *photo = [[Message alloc]initPhotoWithDownloadURL:[NSString stringWithFormat:@"%@", metadata.downloadURL] andTimestamp:photoTimeStamp];
-
-                NSLog(@"PHOTO=%@", photo.timeStamp);
-                [self savePhotoObjectToFirebaseDatabase:photo];
-            }
-        }];
-    NSLog(@"************************MARK**********************");
->>>>>>> 20ec48c1d13cf00d6889d895266a286109eaf979
     [uploadTask resume];
     return url;
 }
