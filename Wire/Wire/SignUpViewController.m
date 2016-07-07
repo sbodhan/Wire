@@ -83,7 +83,7 @@ NSString *newRepeatPwd;
         UserProfile *newUserProfile = [[UserProfile alloc]initUserProfileWithEmail:_emailTF.text username:_usernameTF.text uid:[FIRAuth auth].currentUser.uid];
         
         newUserProfile.profileImageDownloadURL = @"https://firebasestorage.googleapis.com/v0/b/wire-e0cde.appspot.com/o/default_user.png?alt=media&token=d351d796-3f49-4f8f-8ca8-7d)1cd17f510";
-        
+
         NSDictionary *newUserProfileDict = @{@"email": newUserProfile.email, @"username": newUserProfile.username, @"userId": newUserProfile.uid, @"profilePhotoDownloadURL": newUserProfile.profileImageDownloadURL};
         
         [currentUserProfileRef setValue:newUserProfileDict];
