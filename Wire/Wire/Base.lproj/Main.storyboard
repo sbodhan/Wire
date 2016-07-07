@@ -122,7 +122,7 @@
                                     <segue destination="i5Z-ep-M6M" kind="push" id="6cL-fc-DQK"/>
                                 </connections>
                             </button>
-                            <imageView contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="Erm-qV-wcC">
+                            <imageView contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="Erm-qV-wcC">
                                 <rect key="frame" x="45" y="72" width="230" height="230"/>
                                 <gestureRecognizers/>
                                 <connections>

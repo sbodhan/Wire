@@ -151,6 +151,13 @@
     destVC.currentUserProfile = _currentUser;
 }
 
+-(void)viewWillLayoutSubviews {
+    _currentUserProfilePhoto.layer.borderWidth = 4.0;
+    _currentUserProfilePhoto.layer.borderColor = [[UIColor blackColor] CGColor];
+    _currentUserProfilePhoto.layer.cornerRadius = _currentUserProfilePhoto.frame.size.width/2;
+    _currentUserProfilePhoto.layer.masksToBounds = TRUE;
+}
+
 - (IBAction)profilePhotoSelected:(id)sender {
     [self presentCamera];
     
