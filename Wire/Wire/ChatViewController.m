@@ -8,13 +8,11 @@
 
 #import "ChatViewController.h"
 #import "JSQMessage.h"
-
 #import "JSQPhotoMediaItem.h"
 #import "JSQMessagesBubbleImage.h"
 #import "JSQMessagesAvatarImage.h"
 #import "JSQMessagesBubbleImageFactory.h"
 #import "JSQMessagesAvatarImageFactory.h"
-@import FirebaseStorage;
 #import "JSQMessagesCollectionViewCell.h"
 #import "NSString+JSQMessages.h"
 #import "UIImageView+AFNetworking.h"
@@ -33,7 +31,6 @@
 @property (nonatomic, strong) NSString *profilePhotoDownloadURL;
 @property (strong, nonatomic) FIRStorageReference *firebaseStorageRef;
 @property (strong, nonatomic) FIRStorage *firebaseStorage;
-
 
 @end
 
@@ -73,7 +70,6 @@ NSData *localfile;
     NSString *timestamp = [NSString stringWithFormat:@"%@", date];
     NSDictionary *message = @{@"text": text, @"senderId": senderId, @"senderName": senderDisplayName, @"timestamp":timestamp, @"ImageURL": @" "};
     [self sendMessageToFirebase:message];
-//    [[self inputToolbar] ] = @"";
     [self scrollToBottomAnimated:YES];
     
 }
@@ -131,7 +127,6 @@ NSData *localfile;
             return nil;
         }
     }
-    
     return [[NSAttributedString alloc] initWithString:message.senderDisplayName];
 }
 
@@ -156,7 +151,6 @@ NSData *localfile;
 }
 
 
-
 -(void)retrieveMessagesFromFirebase {
     
     FIRDatabaseReference *messagesRef = [[[FIRDatabase database]reference]child:@"messages"];
@@ -170,12 +164,13 @@ NSData *localfile;
                  message = [[JSQMessage alloc]initWithSenderId:snapshot.value[@"senderId"] senderDisplayName:snapshot.value[@"senderName"] date:snapshot.value[@"timestamp"]media:photoItem];
                  [_messages addObject:message];
                  
+                 
                  [self.collectionView reloadData];
              }];
+             
          }else{
              message = [[JSQMessage alloc]initWithSenderId:snapshot.value[@"senderId"] senderDisplayName:snapshot.value[@"senderName"] date:snapshot.value[@"timestamp"] text:snapshot.value[@"text"]];
              [_messages addObject:message];
-             
              
          }
 
@@ -300,7 +295,6 @@ NSData *localfile;
 -(void)uploadPhotoToFirebase:(NSData *)imageData{
     NSLog(@"UPLOAD PHOTO TO FIREBASE");
     
-        NSString *fileName = @"car4.jpg";
         FIRStorage *storage = [FIRStorage storage];
         FIRStorageReference *storageRef = [storage referenceForURL:@"gs://wire-e0cde.appspot.com"];
         FIRStorageReference *imageRef = [storageRef child:@"images/car4.jpg"];
