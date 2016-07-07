@@ -28,8 +28,8 @@
 
         if (user != nil) {
 
-            // Show the Initial ChatDirectoryNavController
-            self.window.rootViewController = [storyboard instantiateViewControllerWithIdentifier:@"ChatDirectoryNavController"];
+            // Show the Initial ChatProfileNavController"
+            self.window.rootViewController = [storyboard instantiateViewControllerWithIdentifier:@"ChatProfileNavController"];
         } else {
             // Login
             self.window.rootViewController = [storyboard instantiateViewControllerWithIdentifier:@"LoginNavController"];

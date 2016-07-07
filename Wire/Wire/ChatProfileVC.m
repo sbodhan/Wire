@@ -1,19 +1,19 @@
 //
-//  ChatDirectoryTableViewController.m
+//  ChatProfileNavController".m
 //  Wire
 //
 //  Created by DetroitLabs on 6/27/16.
 //  Copyright © 2016 Srinivas Bodhanampati. All rights reserved.
 //
 
-#import "ChatDirectoryTableViewController.h"
+#import "ChatProfileVC.h"
 #import "ChatViewController.h"
 #import "UserProfile.h"
 @import FirebaseDatabase;
 @import Firebase;
 @import FirebaseStorage;
 
-@interface ChatDirectoryTableViewController ()<UINavigationControllerDelegate, UIImagePickerControllerDelegate>
+@interface ChatProfileVC ()<UINavigationControllerDelegate, UIImagePickerControllerDelegate>
 @property (strong, nonatomic) UIImagePickerController *imagePicker;
 //FIRStorageReference represents a reference to a Google Cloud Storage object.
 @property (strong, nonatomic) FIRStorageReference *firebaseStorageRef;
@@ -26,7 +26,7 @@
 
 @end
 
-@implementation ChatDirectoryTableViewController
+@implementation ChatProfileVC
 
 - (void)viewDidLoad {
     [self firebaseSetUp];
@@ -38,16 +38,6 @@
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
-}
-
-#pragma mark - Table view data source
-    - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return 1;
-}
-
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"ChatDirectoryCell" forIndexPath:indexPath];
-    return cell;
 }
 
 - (IBAction)signOutBtnPressed:(id)sender {

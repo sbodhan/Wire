@@ -96,10 +96,10 @@
             </objects>
             <point key="canvasLocation" x="553" y="302"/>
         </scene>
-        <!--Chat Directory Table View Controller-->
+        <!--Chat ProfileVC-->
         <scene sceneID="TXl-hk-RJp">
             <objects>
-                <viewController id="QLi-6n-Ams" customClass="ChatDirectoryTableViewController" sceneMemberID="viewController">
+                <viewController id="QLi-6n-Ams" customClass="ChatProfileVC" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="PlA-rB-eWb"/>
                         <viewControllerLayoutGuide type="bottom" id="WJ8-UW-fAq"/>
@@ -313,7 +313,7 @@
         <!--Navigation Controller-->
         <scene sceneID="cOY-cH-Lfa">
             <objects>
-                <navigationController storyboardIdentifier="ChatDirectoryNavController" automaticallyAdjustsScrollViewInsets="NO" useStoryboardIdentifierAsRestorationIdentifier="YES" id="Vjh-k3-Izl" sceneMemberID="viewController">
+                <navigationController storyboardIdentifier="ChatProfileNavController" automaticallyAdjustsScrollViewInsets="NO" useStoryboardIdentifierAsRestorationIdentifier="YES" id="Vjh-k3-Izl" sceneMemberID="viewController">
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="ysm-Cj-8Nv">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
