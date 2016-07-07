@@ -7,6 +7,9 @@
 //
 
 #import "ChatViewController.h"
+
+#import "FullPreviewViewController.h"
+
 #import "JSQMessage.h"
 #import "JSQPhotoMediaItem.h"
 #import "JSQMessagesBubbleImage.h"
@@ -22,6 +25,10 @@
 @import FirebaseStorage;
 
 @interface ChatViewController ()
+@property (nonatomic, strong) UIImage *avatarImageToPass;
+@property (nonatomic, strong) NSURL *avatarImageURL;
+@property (nonatomic, strong) UserProfile *userProfileToPass;
+
 @property (nonatomic, strong) NSMutableArray *messages;
 @property (nonatomic, strong) JSQMessagesBubbleImage *outgoingBubbleImage;
 @property (nonatomic, strong) JSQMessagesBubbleImage *incomingBubbleImage;
@@ -142,6 +149,65 @@ NSData *localfile;
     JSQMessagesAvatarImage *avatar = [JSQMessagesAvatarImageFactory avatarImageWithImage:[UIImage imageNamed:@"default_user"] diameter:5.0];
     return avatar;
 }
+
+//***************************************************************************************************************************
+
+/*
+ Detects if the avatar image is tapped. This grabs the message at that indexPath,
+ uses the senderId and passed it to the 'getCurrentUserProfileFromFirebase' function
+ to get the UserProfile to then gain access to the profile photo.
+ Once it does that then we pass the photo to the FullPreviewVC and display the profile
+ photo in a full screen mode.
+*/
+- (void)collectionView:(JSQMessagesCollectionView *)collectionView didTapAvatarImageView:(UIImageView *)avatarImageView atIndexPath:(NSIndexPath *)indexPath {
+    
+    JSQMessage *message = _messages[indexPath.row];
+
+    [self getCurrentUserProfileFromFirebase:message.senderId completion:^(UserProfile *userProfile) {
+        _avatarImageToPass = userProfile.profileImage;
+        [self performSegueWithIdentifier:@"FullPreviewVCSegue" sender:self];
+    }];
+
+}
+
+- (void)collectionView:(JSQMessagesCollectionView *)collectionView didTapMessageBubbleAtIndexPath:(NSIndexPath *)indexPath {
+    NSLog(@"Tapped message bubble!");
+}
+
+
+/*
+ Accepts the message's senderId and uses it to retrieve the UserProfile for that sender.
+ With this UserProfile we can gain access to the profilePhotoDownloadURL and
+ get the profile photo to then pass to the next screen.
+ */
+-(void)getCurrentUserProfileFromFirebase:(NSString *)messageSenderId completion:(void(^)(UserProfile *userProfile))completion {
+    
+    FIRDatabaseReference *userProfileRef = [[[FIRDatabase database]reference]child:@"userprofile"];
+    FIRDatabaseQuery *userProfileToPassQuery = [[userProfileRef queryOrderedByChild:@"userId"] queryEqualToValue:messageSenderId];
+    [userProfileToPassQuery observeEventType:FIRDataEventTypeChildAdded withBlock:^(FIRDataSnapshot *snapshot) {
+        
+        _userProfileToPass = [[UserProfile alloc]initUserProfileWithEmail:snapshot.value[@"email"] username:snapshot.value[@"username"] uid:snapshot.value[@"userId"]];
+
+        _userProfileToPass.profileImageDownloadURL = snapshot.value[@"profilePhotoDownloadURL"];
+        _userProfileToPass.profileImage = [UIImage imageWithData:[NSData dataWithContentsOfURL:[NSURL URLWithString:snapshot.value[@"profilePhotoDownloadURL"]]]];
+        
+        completion(_userProfileToPass);
+        
+    }];
+}
+
+
+-(void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    if ([segue.identifier isEqualToString:@"FullPreviewVCSegue"]) {
+        FullPreviewViewController *destVC = [segue destinationViewController];
+        destVC.imagePassed = _avatarImageToPass;
+    }
+}
+
+
+
+//***************************************************************************************************************************
+
 
 #pragma mark Firebase Methods
 
