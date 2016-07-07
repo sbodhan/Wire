@@ -20,11 +20,9 @@
 @property (strong, nonatomic) NSString *currentUserProfileKey;
 //An instance of FIRStorage will initialize with the default FIRApp
 @property (strong, nonatomic) FIRStorage *firebaseStorage;
+@property(strong, nonatomic) UserProfile *currentUser;
 @property (weak, nonatomic) IBOutlet UILabel *usernameLabel;
 @property (weak, nonatomic) IBOutlet UIImageView *currentUserProfilePhoto;
-
-
-@property(strong, nonatomic) UserProfile *currentUser;
 
 @end
 
@@ -32,6 +30,7 @@
 
 - (void)viewDidLoad {
     [self firebaseSetUp];
+    [self listenForChangesInUserProfile];
     [self getCurrentUserProfileFromFirebase];
     [super viewDidLoad];
 }
@@ -64,7 +63,6 @@
     [currentUserProfileQuery observeEventType:FIRDataEventTypeChildAdded withBlock:^(FIRDataSnapshot *snapshot) {
         NSLog(@"SNAPSHOT %@", snapshot);
         _currentUserProfileKey = snapshot.key;
-        
         _currentUser = [[UserProfile alloc]initUserProfileWithEmail:snapshot.value[@"email"] username:snapshot.value[@"username"] uid:snapshot.value[@"userId"]];
         _currentUser.profileImage = [UIImage imageWithData:[NSData dataWithContentsOfURL:[NSURL URLWithString:snapshot.value[@"profilePhotoDownloadURL"]]]];
         dispatch_async(dispatch_get_main_queue(), ^{
@@ -72,6 +70,21 @@
             [_usernameLabel setText:[NSString stringWithFormat:@"Hello, %@!", _currentUser.username]];
         });
     }];
+}
+
+-(void)listenForChangesInUserProfile {
+    FIRDatabaseReference *UserProfileRef = [[[FIRDatabase database]reference]child:@"userprofile"];
+    FIRDatabaseQuery *currentUserProfileChangedQuery = [[UserProfileRef queryOrderedByChild:@"userId"] queryEqualToValue:[FIRAuth auth].currentUser.uid];
+    
+    [currentUserProfileChangedQuery observeEventType:FIRDataEventTypeChildChanged withBlock:^(FIRDataSnapshot *snapshot) {
+        _currentUser = [[UserProfile alloc]initUserProfileWithEmail:snapshot.value[@"email"] username:snapshot.value[@"username"] uid:snapshot.value[@"userId"]];
+        _currentUser.profileImage = [UIImage imageWithData:[NSData dataWithContentsOfURL:[NSURL URLWithString:snapshot.value[@"profilePhotoDownloadURL"]]]];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [_currentUserProfilePhoto setImage:_currentUser.profileImage];
+            [_usernameLabel setText:[NSString stringWithFormat:@"Hello, %@!", _currentUser.username]];
+        });
+    }];
+    
 }
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
@@ -130,30 +143,21 @@
 -(void)updateCurrentUserProfileImageDownloadURLOnFirebaseDatabase:(UserProfile *)userProfile {
     
     FIRDatabaseReference *firebaseRef = [[FIRDatabase database] reference];
-//
-//    NSString *key = [firebaseRef child:[NSString stringWithFormat:@"userprofile/%@", _currentUserProfileKey]].key;
     
+    //Need every value filled or it will just remove what we didn't put in the dictionary. For an example if the profileImageDownloadURL was the only thing we put in this dictionary and used this dictionary to update the child node then the email, userId and the username would be removed and only the profilePhotoDownloadURL would be in that child node.
     NSDictionary *userProfileToUpdate = @{@"profilePhotoDownloadURL": userProfile.profileImageDownloadURL,
                                           @"email": userProfile.email,
                                           @"userId": userProfile.uid,
                                           @"username": userProfile.username};
     
-//    NSDictionary *childUpdates = @{[@"/userprofile/" stringByAppendingString:_currentUserProfileKey]: userProfileToUpdate,
-//                                   [NSString stringWithFormat:@"profilePhotoDownloadURL/%@/%@/", userProfile.profileImageDownloadURL, _currentUserProfileKey]: userProfileToUpdate};
-    
     NSDictionary *childUpdates = @{[@"/userprofile/" stringByAppendingString:_currentUserProfileKey]: userProfileToUpdate};
-    
-    //,[NSString stringWithFormat:@"/userprofile/%@/%@/", userProfile.profileImageDownloadURL, _currentUserProfileKey]: userProfileToUpdate
-    
-    NSLog(@"Child Updates**********: %@", childUpdates);
-    
+
     [firebaseRef updateChildValues:childUpdates];
 
 }
 
 - (IBAction)profilePhotoSelected:(id)sender {
     [self presentCamera];
-    
     
 }
 
