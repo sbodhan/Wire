@@ -59,7 +59,6 @@ NSDictionary *messageToUpdate;
     _messages = [[NSMutableArray alloc]initWithObjects:dummyMessage, nil];
     _avatars = [[NSMutableDictionary alloc]init];
     
-    self.showTypingIndicator = !self.showTypingIndicator;
 }
 
 - (void)didReceiveMemoryWarning {
@@ -69,16 +68,26 @@ NSDictionary *messageToUpdate;
 #pragma mark JSQMessagesViewController Required Protocols.
 //Send Button Pressed.
 -(void)didPressSendButton:(UIButton *)button withMessageText:(NSString *)text senderId:(NSString *)senderId senderDisplayName:(NSString *)senderDisplayName date:(NSDate *)date{
-    self.showTypingIndicator = !self.showTypingIndicator;
     [self firebaseSetUp];
     //send text messsage
     NSString *timestamp = [NSString stringWithFormat:@"%@", date];
-    NSDictionary *messageDictionary = @{@"text": text, @"senderId": senderId, @"senderName": senderDisplayName, @"timestamp":timestamp};
+    NSDictionary *messageDictionary = @{@"text": text, @"senderId": senderId, @"senderName": senderDisplayName, @"timestamp":timestamp, @"imageURL":@" "};
     [self sendMessageToFirebase:messageDictionary];
     
 //    [self scrollToBottomAnimated:YES];
     
 }
+
+
+//- (void)receiveMessagePressed:(UIBarButtonItem *)sender
+//{
+//    self.showTypingIndicator = !self.showTypingIndicator;
+//    
+//    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+//
+//        [self finishReceivingMessage];
+//    });
+//}
 
 //Number of items in section **How many items in each section - in our case it will be however many messages we have** - REQUIRED
 -(NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
@@ -216,11 +225,12 @@ NSDictionary *messageToUpdate;
 
 
 -(void)retrieveMessagesFromFirebase {
-    
     FIRDatabaseReference *messagesRef = [[[FIRDatabase database]reference]child:@"messages"];
     [messagesRef observeEventType:FIRDataEventTypeChildAdded withBlock:
      ^(FIRDataSnapshot *snapshot) {
-         if (snapshot.value[@"imageURL"] != nil){
+         NSLog(@"_______________before snapshot");
+         if (![snapshot.value[@"imageURL"] isEqualToString:@" "]){
+             NSLog(@"_______________in the  snapshot");
              [self downloadImageFromFirebaseWithAFNetworking:snapshot.value[@"imageURL"] completion:^(UIImage *messageImage) {
                  resizedImg = messageImage;
                  JSQPhotoMediaItem *photoItem = [[JSQPhotoMediaItem alloc] initWithImage:resizedImg];
@@ -230,6 +240,7 @@ NSDictionary *messageToUpdate;
              }];
              
          } else {
+             NSLog(@"_______________ text messge ok");
              message = [[JSQMessage alloc]initWithSenderId:snapshot.value[@"senderId"] senderDisplayName:snapshot.value[@"senderName"] date:snapshot.value[@"timestamp"] text:snapshot.value[@"text"]];
              [_messages addObject:message];
          }
@@ -359,8 +370,6 @@ NSDictionary *messageToUpdate;
     FIRStorageReference *storageRef = [storage referenceForURL:@"gs://wire-e0cde.appspot.com"];
     FIRStorageReference *imageRef = [storageRef child:newImageReference];
     FIRStorageUploadTask *uploadTask = [imageRef putData:imageData metadata:nil completion:^(FIRStorageMetadata *metadata, NSError *error){
-        
-        
         if(error){
             NSLog(@"%@", error.description);
         }
@@ -381,7 +390,7 @@ NSDictionary *messageToUpdate;
 -(void)updateMessageImageUrlToFB: (NSString *)url {
     FIRDatabaseReference *firebaseRef = [[FIRDatabase database] reference];
     NSLog(@"???????????????????????????????????????????%@",oldPhotoTimestamp);
-    messageToUpdate = @{@"ImageURL": url,
+    messageToUpdate = @{@"imageURL": url,
                                       @"senderId":self.senderId,
                                       @"senderName": self.senderDisplayName,
                                       @"text": @"test",
