@@ -45,8 +45,12 @@
 @implementation ChatViewController
 UIImage *resizedImg;
 NSString *imageURL;
+<<<<<<< HEAD
+JSQMessage *message;
+=======
 Message *message;
 NSData *localfile;
+>>>>>>> aa18acec0aa999512f25ba1594372c65f05920d0
 
 - (void)viewDidLoad {
     [self setJSQsenderIdAndDisplayName];
@@ -86,8 +90,13 @@ NSData *localfile;
 
 //Message Data for item at indexPath **Data source for the messages** - REQUIRED
 -(id<JSQMessageData>)collectionView:(JSQMessagesCollectionView *)collectionView messageDataForItemAtIndexPath:(NSIndexPath *)indexPath {
+<<<<<<< HEAD
+    
+    return _messages[indexPath.row];
+=======
 
     return _messages[indexPath.item];
+>>>>>>> aa18acec0aa999512f25ba1594372c65f05920d0
 }
 
 //MessageBubbleImageData for item at indexPath **this is for the bubble image behind each text** - REQUIRED
@@ -104,6 +113,17 @@ NSData *localfile;
 //AvatarImageData for item at indexPath **this is the avatarImage that needs to be supplied for each text** - REQUIRED - return nil if you want to override this and have no avatarImage.
 
 -(id<JSQMessageAvatarImageDataSource>)collectionView:(JSQMessagesCollectionView *)collectionView avatarImageDataForItemAtIndexPath:(NSIndexPath *)indexPath {
+<<<<<<< HEAD
+    
+    JSQMessage *message = [_messages objectAtIndex:indexPath.row];
+    
+    if (_avatars[message.senderId] == nil) {
+        
+        return [self setPlaceHolderAvatars:message.senderDisplayName];
+    }
+    
+    return _avatars[message.senderId];
+=======
 
     Message *message = [_messages objectAtIndex:indexPath.item];
     
@@ -112,6 +132,7 @@ NSData *localfile;
 //        return [self setPlaceHolderAvatars:message.senderDisplayName];
 //    }
     return message.avatarImage;
+>>>>>>> aa18acec0aa999512f25ba1594372c65f05920d0
 }
 
 -(CGFloat)collectionView:(JSQMessagesCollectionView *)collectionView layout:(JSQMessagesCollectionViewFlowLayout *)collectionViewLayout heightForMessageBubbleTopLabelAtIndexPath:(NSIndexPath *)indexPath {
@@ -229,10 +250,32 @@ NSData *localfile;
              message = [[Message alloc]initWithSenderId:snapshot.value[@"senderId"] senderDisplayName:snapshot.value[@"senderName"] date:snapshot.value[@"timestamp"] text:snapshot.value[@"text"]];
          }
          
+<<<<<<< HEAD
+         if ([message.senderId isEqualToString:self.senderId]) {
+             
+             NSLog(@"CURRENT USER PROFILE DOWNLOAD URL: %@", _currentUserProfile.profileImageDownloadURL);
+             
+             [self downloadImageFromFirebaseWithAFNetworking:_currentUserProfile.profileImageDownloadURL completion:^(UIImage *profileImage) {
+                 [self setUpAvatarImages:message.senderId image:profileImage incoming:FALSE];
+                 [self.collectionView reloadData];
+             }];
+         } else {
+             [self getIncomingUserProfilePhotoDownloadURLFromFirebaseWithSenderId:message.senderId completion:^(NSString *urlString) {
+                 [self downloadImageFromFirebaseWithAFNetworking:urlString completion:^(UIImage *profileImage) {
+                     [self setUpAvatarImages:message.senderId image:profileImage incoming:TRUE];
+                     [self.collectionView reloadData];
+                 }];
+             }];
+         }
+         
+         [self.collectionView reloadData];
+     }];
+=======
         [self assignAvatarsToMessages:message];
 
         [self.collectionView reloadData];
     }];
+>>>>>>> aa18acec0aa999512f25ba1594372c65f05920d0
 }
 
 -(void)assignAvatarsToMessages:(Message *)message {
@@ -260,8 +303,11 @@ NSData *localfile;
 
 -(void)setUpAvatarImages:(Message *)message image:(UIImage *)image incoming:(BOOL)incoming {
     double diameter;
+<<<<<<< HEAD
+=======
 
     NSLog(@"MESSAGE TEXT: %@", message.text);
+>>>>>>> aa18acec0aa999512f25ba1594372c65f05920d0
     
     if (incoming == TRUE) {
         diameter = self.collectionView.collectionViewLayout.incomingAvatarViewSize.width;
@@ -350,6 +396,7 @@ NSData *localfile;
     [self presentViewController:view animated:YES completion:nil];
 }
 
+<<<<<<< HEAD
 -(NSString *)uploadPhotoToFirebase:(NSData *)imageData{
     NSString *uniqueID = [[NSUUID UUID]UUIDString];
     NSString *newImageReference = [NSString stringWithFormat:@"images/%@.jpg", uniqueID];
@@ -370,6 +417,7 @@ NSData *localfile;
             url = [NSString stringWithFormat:@"%@",photo.downloadURL];
         }
     }];
+=======
 -(void)uploadPhotoToFirebase:(NSData *)imageData{
 
         FIRStorage *storage = [FIRStorage storage];
@@ -384,10 +432,15 @@ NSData *localfile;
                 NSString *photoTimeStamp = [self createFormattedTimeStamp];
             }
         }];
+>>>>>>> aa18acec0aa999512f25ba1594372c65f05920d0
     [uploadTask resume];
     return url;
 }
 
+<<<<<<< HEAD
+
+=======
+>>>>>>> aa18acec0aa999512f25ba1594372c65f05920d0
 - (void)takePicture{
     UIImagePickerController *imagePicker = [[UIImagePickerController alloc] init];
     [self presentViewController:imagePicker animated:NO completion:nil];
@@ -447,7 +500,26 @@ NSData *localfile;
     _firebaseStorageRef = [_firebaseStorage referenceForURL:@"gs://wire-e0cde.appspot.com"];
 }
 
+<<<<<<< HEAD
+=======
+//-(void)uploadPhotoToFirebase:(NSData *)imageData {
+//    //Create a uniqueID for the image and add it to the end of the images reference.
+//    NSString *uniqueID = [[NSUUID UUID]UUIDString];
+//    NSString *newImageReference = [NSString stringWithFormat:@"images/%@.jpg", uniqueID];
+//    //imagesRef creates a reference for the images folder and then adds a child to that folder, which will be every time a photo is taken.
+//    FIRStorageReference *imagesRef = [_firebaseStorageRef child:newImageReference];
+//    //This uploads the photo's NSData onto Firebase Storage.
+//    FIRStorageUploadTask *uploadTask = [imagesRef putData:imageData metadata:nil completion:^(FIRStorageMetadata *metadata, NSError *error) {
+//        if (error) {
+//            NSLog(@"ERROR: %@", error.description);
+//        } else {
+//            imageURL = [NSString stringWithFormat:@"%@", metadata.downloadURL];
+//        }
+//    }];
+//    [uploadTask resume];
+//}
 
+>>>>>>> aa18acec0aa999512f25ba1594372c65f05920d0
 
 #pragma mark Timestamp and Date Formatter Methods
 -(NSString *)createFormattedTimeStamp {
@@ -461,6 +533,10 @@ NSData *localfile;
     NSDateFormatter *dateFormatter = [[NSDateFormatter alloc]init];
     [dateFormatter setDateFormat:@"MM/dd/YYYY HH:mm:ss"];
     NSString *formattedDate = [dateFormatter stringFromDate:date];
+<<<<<<< HEAD
+    NSLog(@"FORMAT DATE################= %@", formattedDate);
+=======
+>>>>>>> aa18acec0aa999512f25ba1594372c65f05920d0
     return formattedDate;
 }
 
