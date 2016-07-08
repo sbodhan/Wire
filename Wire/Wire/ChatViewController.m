@@ -55,6 +55,8 @@ NSDictionary *messageToUpdate;
     [super viewDidLoad];
     [self retrieveMessagesFromFirebase];
     [self JSQMessageBubbleSetup];
+    
+    [self scrollToBottomAnimated:true];
 }
 
 - (void)didReceiveMemoryWarning {
