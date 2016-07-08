@@ -85,7 +85,6 @@
     _firebaseStorageRef = [_firebaseStorage referenceForURL:@"gs://wire-e0cde.appspot.com"];
 }
 
-
 //Gets the current user's UserProfile from Firebase.
 -(void)getCurrentUserProfileFromFirebase {
     FIRDatabaseReference *UserProfileRef = [[[FIRDatabase database]reference]child:@"userprofile"];
