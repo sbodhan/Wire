@@ -7,6 +7,7 @@
 //
 
 #import "ChatViewController.h"
+
 #import "FullPreviewViewController.h"
 
 #import "JSQMessage.h"
@@ -20,7 +21,6 @@
 #import "NSString+JSQMessages.h"
 #import "UIImageView+AFNetworking.h"
 #import "AFNetworking.h"
-@import FirebaseStorage;
 @import FirebaseDatabase;
 @import FirebaseAuth;
 @import FirebaseStorage;
@@ -44,9 +44,6 @@
 @implementation ChatViewController
 UIImage *resizedImg;
 NSString *imageURL;
-NSString *randomMessageKey;
-NSString *oldPhotoTimestamp;
-NSDictionary *messageToUpdate;
 Message *message;
 NSData *localfile;
 
@@ -55,11 +52,11 @@ NSData *localfile;
     [super viewDidLoad];
     [self retrieveMessagesFromFirebase];
     [self JSQMessageBubbleSetup];
-    JSQMessage *dummyMessage = [[JSQMessage alloc]initWithSenderId:self.senderId senderDisplayName:self.senderDisplayName date:[NSDate date] text:@"test Message"];
-    _messages = [[NSMutableArray alloc]initWithObjects:dummyMessage, nil];
+    _messages = [[NSMutableArray alloc]init];
     _avatars = [[NSMutableDictionary alloc]init];
     
     self.showTypingIndicator = !self.showTypingIndicator;
+    
 }
 
 - (void)didReceiveMemoryWarning {
@@ -68,15 +65,18 @@ NSData *localfile;
 
 #pragma mark JSQMessagesViewController Required Protocols.
 //Send Button Pressed.
--(void)didPressSendButton:(UIButton *)button withMessageText:(NSString *)text senderId:(NSString *)senderId senderDisplayName:(NSString *)senderDisplayName date:(NSDate *)date{
+
+-(void)didPressSendButton:(UIButton *)button withMessageText:(NSString *)text senderId:(NSString *)senderId senderDisplayName:(NSString *)senderDisplayName date:(NSDate *)date {
+    
     self.showTypingIndicator = !self.showTypingIndicator;
     [self firebaseSetUp];
-    //send text messsage
-    NSString *timestamp = [NSString stringWithFormat:@"%@", date];
-    NSDictionary *messageDictionary = @{@"text": text, @"senderId": senderId, @"senderName": senderDisplayName, @"timestamp":timestamp};
-    [self sendMessageToFirebase:messageDictionary];
+    NSData *resizedImgData =  UIImageJPEGRepresentation(resizedImg, .50);
+    [self uploadPhotoToFirebase:resizedImgData];
     
-//    [self scrollToBottomAnimated:YES];
+    NSString *timestamp = [NSString stringWithFormat:@"%@", date];
+    NSDictionary *message = @{@"text": text, @"senderId": senderId, @"senderName": senderDisplayName, @"timestamp":timestamp, @"ImageURL": @" "};
+    [self sendMessageToFirebase:message];
+    [self scrollToBottomAnimated:YES];
     
 }
 
@@ -121,7 +121,7 @@ NSData *localfile;
 
 - (NSAttributedString *)collectionView:(JSQMessagesCollectionView *)collectionView attributedTextForMessageBubbleTopLabelAtIndexPath:(NSIndexPath *)indexPath {
     JSQMessage *message = [_messages objectAtIndex:indexPath.item];
-    
+
     if ([message.senderId isEqualToString:self.senderId]) {
         return nil;
     }
@@ -156,7 +156,7 @@ NSData *localfile;
  to get the UserProfile to then gain access to the profile photo.
  Once it does that then we pass the photo to the FullPreviewVC and display the profile
  photo in a full screen mode.
- */
+*/
 - (void)collectionView:(JSQMessagesCollectionView *)collectionView didTapAvatarImageView:(UIImageView *)avatarImageView atIndexPath:(NSIndexPath *)indexPath {
     
     Message *message = _messages[indexPath.item];
@@ -165,7 +165,7 @@ NSData *localfile;
         _avatarImageToPass = userProfile.profileImage;
         [self performSegueWithIdentifier:@"FullPreviewVCSegue" sender:self];
     }];
-    
+
 }
 
 - (void)collectionView:(JSQMessagesCollectionView *)collectionView didTapMessageBubbleAtIndexPath:(NSIndexPath *)indexPath {
@@ -208,7 +208,8 @@ NSData *localfile;
 #pragma mark Firebase Methods
 
 -(void)sendMessageToFirebase:(NSDictionary *)message {
-    [[[[FIRDatabase database]reference]child:@"messages"] updateChildValues:message];
+    FIRDatabaseReference *messagesRef = [[[[FIRDatabase database]reference]child:@"messages"]childByAutoId];
+    [messagesRef setValue:message];
 }
 
 
@@ -235,11 +236,6 @@ NSData *localfile;
     }];
 }
 
-
-//download all the user profile from database.
-//-(NSMutableArray *)retrieveUsersInChatRoom {
-//    FIRDatabaseReference *userprofileRef = [[[FIRDatabase database]reference]child:@"userprofile"];
-//    [userprofileRef observeEventType:FIRDataEventTypeChildAdded withBlock:^(FIRDataSnapshot *snapshot) {
 -(void)assignAvatarsToMessages:(Message *)message {
     if ([message.senderId isEqualToString:self.senderId]) {
         
@@ -273,7 +269,7 @@ NSData *localfile;
     } else {
         diameter = self.collectionView.collectionViewLayout.outgoingAvatarViewSize.width;
     }
-    
+
     JSQMessagesAvatarImage *avatarImage = [JSQMessagesAvatarImageFactory
                                            avatarImageWithImage:image
                                            diameter:diameter];
@@ -281,9 +277,8 @@ NSData *localfile;
     message.avatarImage = avatarImage;
 }
 
-//update the sender's profile photo.
 -(void)getIncomingUserProfilePhotoDownloadURLFromFirebaseWithSenderId:(NSString *)senderId completion:(void(^)(NSString *urlString))completion {
-    
+
     FIRDatabaseReference *userprofileRef = [[[FIRDatabase database]reference]child:@"userprofile"];
     FIRDatabaseQuery *userThatSentMessageQuery = [[userprofileRef queryOrderedByChild:@"userId"]queryEqualToValue:senderId];
     [userThatSentMessageQuery observeEventType:FIRDataEventTypeChildAdded withBlock:^(FIRDataSnapshot *snapshot) {
@@ -301,7 +296,7 @@ NSData *localfile;
     } failure:^(NSURLSessionDataTask *task, NSError *error) {
         NSLog(@"Error: %@", error);
     }];
-    
+
 }
 
 //Creates placeholderAvatars, which is just the first initial of the user's display name.
@@ -332,6 +327,11 @@ NSData *localfile;
                          handler:^(UIAlertAction * action)
                          {
                              [self chooseFromGallery];
+                             //Do some thing here
+                             UIImage *image = [UIImage imageNamed:@"car4.jpg"];
+                             localfile =  UIImageJPEGRepresentation(image, .50);
+                             [self uploadPhotoToFirebase:localfile];
+                             
                              [view dismissViewControllerAnimated:YES completion:nil];
                              
                          }];
@@ -344,34 +344,13 @@ NSData *localfile;
                                  [view dismissViewControllerAnimated:YES completion:nil];
                                  
                              }];
+    
+    
     [view addAction:ok];
     [view addAction:cancel];
     [self presentViewController:view animated:YES completion:nil];
 }
 
--(void)uploadPhotoToFirebase:(NSData *)imageData{
-    NSString *uniqueID = [[NSUUID UUID]UUIDString];
-    NSString *newImageReference = [NSString stringWithFormat:@"images/%@.jpg", uniqueID];
-    __block NSString *url;
-    
-    FIRStorage *storage = [FIRStorage storage];
-    FIRStorageReference *storageRef = [storage referenceForURL:@"gs://wire-e0cde.appspot.com"];
-    FIRStorageReference *imageRef = [storageRef child:newImageReference];
-    FIRStorageUploadTask *uploadTask = [imageRef putData:imageData metadata:nil completion:^(FIRStorageMetadata *metadata, NSError *error){
-        
-        
-        if(error){
-            NSLog(@"%@", error.description);
-        }
-        
-        else{
-            NSString *photoTimeStamp = [self createFormattedTimeStamp];
-            Message *photo = [[Message alloc]initPhotoWithDownloadURL:[NSString stringWithFormat:@"%@", metadata.downloadURL] andTimestamp:photoTimeStamp];
-            NSLog(@"PHOTO time stamp is %@", photo.timeStamp);
-            url = [NSString stringWithFormat:@"%@",photo.downloadURL];
-            [self updateMessageImageUrlToFB:url];
-        }
-    }];
 -(void)uploadPhotoToFirebase:(NSData *)imageData{
 
         FIRStorage *storage = [FIRStorage storage];
@@ -388,24 +367,6 @@ NSData *localfile;
         }];
     [uploadTask resume];
 }
-
-
-
--(void)updateMessageImageUrlToFB: (NSString *)url {
-    FIRDatabaseReference *firebaseRef = [[FIRDatabase database] reference];
-    NSLog(@"???????????????????????????????????????????%@",oldPhotoTimestamp);
-    messageToUpdate = @{@"ImageURL": url,
-                                      @"senderId":self.senderId,
-                                      @"senderName": self.senderDisplayName,
-                                      @"text": @"test",
-                                      @"timestamp": oldPhotoTimestamp
-                                      };
-    NSDictionary *childUpdates = @{[@"/messages/" stringByAppendingString:randomMessageKey ]: messageToUpdate};
-    
-    [firebaseRef updateChildValues:childUpdates];
-}
-
-
 
 - (void)takePicture{
     UIImagePickerController *imagePicker = [[UIImagePickerController alloc] init];
@@ -427,24 +388,8 @@ NSData *localfile;
 }
 
 -(void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary<NSString *,id> *)info{
-    
-    //grab the image we just took or chosen from gallery
     UIImage *image = [info valueForKey:UIImagePickerControllerOriginalImage];
-    
-    //reduce size of the image, optional
     resizedImg = [self reduceImageSize:image];
-    
-    NSData *resizedImgData =  UIImageJPEGRepresentation(resizedImg, .50);
-    [self uploadPhotoToFirebase:resizedImgData];
-    
-    NSString *timestamp = [NSString stringWithFormat:@"%@", [NSDate date]];
-    oldPhotoTimestamp = timestamp;
-    
-    NSDictionary *aDictionary = @{@"text":@" ", @"senderId": self.senderId, @"senderName": self.senderDisplayName, @"timestamp":timestamp, @"imageURL":@"https://firebasestorage.googleapis.com/v0/b/wire-e0cde.appspot.com/o/car4.jpg?alt=media&token=e99baf6a-0b49-4439-960a-591d72bc21df"};
-    randomMessageKey = [[NSUUID UUID] UUIDString];
-    NSDictionary *messageDictionary = @{randomMessageKey:aDictionary};
-    [self sendMessageToFirebase:messageDictionary];
-    
     JSQPhotoMediaItem *photoItem = [[JSQPhotoMediaItem alloc] initWithImage:resizedImg];
     message = [[Message alloc]initWithSenderId:self.senderId senderDisplayName:self.senderDisplayName date:[NSDate date] media:photoItem];
     [_messages addObject:message];
@@ -469,16 +414,37 @@ NSData *localfile;
     _firebaseStorageRef = [_firebaseStorage referenceForURL:@"gs://wire-e0cde.appspot.com"];
 }
 
+//-(void)uploadPhotoToFirebase:(NSData *)imageData {
+//    //Create a uniqueID for the image and add it to the end of the images reference.
+//    NSString *uniqueID = [[NSUUID UUID]UUIDString];
+//    NSString *newImageReference = [NSString stringWithFormat:@"images/%@.jpg", uniqueID];
+//    //imagesRef creates a reference for the images folder and then adds a child to that folder, which will be every time a photo is taken.
+//    FIRStorageReference *imagesRef = [_firebaseStorageRef child:newImageReference];
+//    //This uploads the photo's NSData onto Firebase Storage.
+//    FIRStorageUploadTask *uploadTask = [imagesRef putData:imageData metadata:nil completion:^(FIRStorageMetadata *metadata, NSError *error) {
+//        if (error) {
+//            NSLog(@"ERROR: %@", error.description);
+//        } else {
+//            imageURL = [NSString stringWithFormat:@"%@", metadata.downloadURL];
+//        }
+//    }];
+//    [uploadTask resume];
+//}
 
 
 #pragma mark Timestamp and Date Formatter Methods
 -(NSString *)createFormattedTimeStamp {
     NSDate *timestamp = [NSDate date];
-    NSLog(@"TIMESTAMP ##############= %@", timestamp);
-    NSString *stringTimestamp = [NSString stringWithFormat:@"%@", [NSDate date]];
-    NSLog(@"STRINGTIMESTAMP################= %@", stringTimestamp);
+    NSString *stringTimestamp = [self formatDate:timestamp];
     return stringTimestamp;
 }
 
+
+-(NSString *)formatDate:(NSDate *)date {
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc]init];
+    [dateFormatter setDateFormat:@"MM/dd/YYYY HH:mm:ss"];
+    NSString *formattedDate = [dateFormatter stringFromDate:date];
+    return formattedDate;
+}
 
 @end
