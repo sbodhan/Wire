@@ -71,7 +71,7 @@ NSDictionary *messageToUpdate;
     [self firebaseSetUp];
     //send text messsage
     NSString *timestamp = [NSString stringWithFormat:@"%@", date];
-    NSDictionary *messageDictionary = @{@"text": text, @"senderId": senderId, @"senderName": senderDisplayName, @"timestamp":timestamp, @"imageURL":@" "};
+    NSDictionary *messageDictionary = @{@"text": text, @"senderId": senderId, @"senderName": senderDisplayName, @"timestamp":timestamp};
     [self sendMessageToFirebase:messageDictionary];
     
 //    [self scrollToBottomAnimated:YES];
