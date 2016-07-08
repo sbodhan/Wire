@@ -29,6 +29,7 @@
 @property (nonatomic, strong) NSURL *avatarImageURL;
 @property (nonatomic, strong) UserProfile *userProfileToPass;
 @property (nonatomic, strong) NSMutableArray *messages;
+@property (nonatomic, strong) NSArray *sortedArray;
 @property (nonatomic, strong) JSQMessagesBubbleImage *outgoingBubbleImage;
 @property (nonatomic, strong) JSQMessagesBubbleImage *incomingBubbleImage;
 @property (nonatomic, strong) UserProfile *userProfile;
@@ -84,18 +85,18 @@ NSDictionary *messageToUpdate;
 
 //Number of items in section **How many items in each section - in our case it will be however many messages we have** - REQUIRED
 -(NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
-    return [_messages count];
+    return [_sortedArray count];
 }
 
 //Message Data for item at indexPath **Data source for the messages** - REQUIRED
 -(id<JSQMessageData>)collectionView:(JSQMessagesCollectionView *)collectionView messageDataForItemAtIndexPath:(NSIndexPath *)indexPath {
 
-    return _messages[indexPath.item];
+    return _sortedArray[indexPath.item];
 }
 
 //MessageBubbleImageData for item at indexPath **this is for the bubble image behind each text** - REQUIRED
 -(id<JSQMessageBubbleImageDataSource>)collectionView:(JSQMessagesCollectionView *)collectionView messageBubbleImageDataForItemAtIndexPath:(NSIndexPath *)indexPath {
-    Message *message = _messages[indexPath.item];
+    Message *message = _sortedArray[indexPath.item];
     
     if ([message.senderId isEqualToString:self.senderId]) {
         return self.outgoingBubbleImage;
@@ -108,7 +109,7 @@ NSDictionary *messageToUpdate;
 
 -(id<JSQMessageAvatarImageDataSource>)collectionView:(JSQMessagesCollectionView *)collectionView avatarImageDataForItemAtIndexPath:(NSIndexPath *)indexPath {
 
-    Message *message = [_messages objectAtIndex:indexPath.item];
+    Message *message = [_sortedArray objectAtIndex:indexPath.item];
     
     return message.avatarImage;
 }
@@ -118,14 +119,14 @@ NSDictionary *messageToUpdate;
 }
 
 - (NSAttributedString *)collectionView:(JSQMessagesCollectionView *)collectionView attributedTextForMessageBubbleTopLabelAtIndexPath:(NSIndexPath *)indexPath {
-    JSQMessage *message = [_messages objectAtIndex:indexPath.item];
+    Message *message = [_sortedArray objectAtIndex:indexPath.item];
     
     if ([message.senderId isEqualToString:self.senderId]) {
         return nil;
     }
     
     if (indexPath.item - 1 > 0) {
-        JSQMessage *previousMessage = [_messages objectAtIndex:indexPath.item - 1];
+        Message *previousMessage = [_sortedArray objectAtIndex:indexPath.item - 1];
         if ([[previousMessage senderId] isEqualToString:message.senderId]) {
             return nil;
         }
@@ -155,7 +156,7 @@ NSDictionary *messageToUpdate;
  */
 - (void)collectionView:(JSQMessagesCollectionView *)collectionView didTapAvatarImageView:(UIImageView *)avatarImageView atIndexPath:(NSIndexPath *)indexPath {
     
-    Message *message = _messages[indexPath.item];
+    Message *message = _sortedArray[indexPath.item];
 
     [self getCurrentUserProfileFromFirebase:message.senderId completion:^(UserProfile *userProfile) {
         _avatarImageToPass = userProfile.profileImage;
@@ -238,7 +239,7 @@ NSDictionary *messageToUpdate;
             dispatch_async(dispatch_get_main_queue(), ^{
                 [self setUpAvatarImages:message image:profileImage incoming:FALSE];
                 [_messages addObject:message];
-                [self.collectionView reloadData];
+                [self sortMessagesArray:_messages];
             });
         }];
     } else {
@@ -247,11 +248,12 @@ NSDictionary *messageToUpdate;
                 dispatch_async(dispatch_get_main_queue(), ^{
                     [self setUpAvatarImages:message image:profileImage incoming:TRUE];
                     [_messages addObject:message];
-                    [self.collectionView reloadData];
+                    [self sortMessagesArray:_messages];
                 });
             }];
         }];
     }
+    
 }
 
 -(void)setUpAvatarImages:(Message *)message image:(UIImage *)image incoming:(BOOL)incoming {
@@ -444,6 +446,15 @@ NSDictionary *messageToUpdate;
     NSDate *timestamp = [NSDate date];
     NSString *stringTimestamp = [NSString stringWithFormat:@"%@", [NSDate date]];
     return stringTimestamp;
+}
+
+-(void)sortMessagesArray:(NSMutableArray *)messagesArray {
+    _sortedArray = [messagesArray sortedArrayUsingComparator:^NSComparisonResult(id obj1, id obj2) {
+        NSDate *firstDate = [(Message*)obj1 date];
+        NSDate *secondDate = [(Message*)obj2 date];
+        return [firstDate compare:secondDate];
+    }];
+    [self.collectionView reloadData];
 }
 
 
