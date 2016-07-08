@@ -29,7 +29,6 @@
 @property (nonatomic, strong) UIImage *avatarImageToPass;
 @property (nonatomic, strong) NSURL *avatarImageURL;
 @property (nonatomic, strong) UserProfile *userProfileToPass;
-
 @property (nonatomic, strong) NSMutableArray *messages;
 @property (nonatomic, strong) JSQMessagesBubbleImage *outgoingBubbleImage;
 @property (nonatomic, strong) JSQMessagesBubbleImage *incomingBubbleImage;
@@ -352,44 +351,22 @@ NSData *localfile;
 -(void)uploadPhotoToFirebase:(NSData *)imageData{
     NSString *uniqueID = [[NSUUID UUID]UUIDString];
     NSString *newImageReference = [NSString stringWithFormat:@"images/%@.jpg", uniqueID];
-    __block NSString *url;
-    
+
     FIRStorage *storage = [FIRStorage storage];
     FIRStorageReference *storageRef = [storage referenceForURL:@"gs://wire-e0cde.appspot.com"];
     FIRStorageReference *imageRef = [storageRef child:newImageReference];
     FIRStorageUploadTask *uploadTask = [imageRef putData:imageData metadata:nil completion:^(FIRStorageMetadata *metadata, NSError *error){
-        
-        
+        NSString *url;
         if(error){
             NSLog(@"%@", error.description);
         }
-        
         else{
-            NSString *photoTimeStamp = [self createFormattedTimeStamp];
-            Message *photo = [[Message alloc]initPhotoWithDownloadURL:[NSString stringWithFormat:@"%@", metadata.downloadURL] andTimestamp:photoTimeStamp];
-            NSLog(@"PHOTO time stamp is %@", photo.timeStamp);
-            url = [NSString stringWithFormat:@"%@",photo.downloadURL];
+            url = [NSString stringWithFormat:@"%@",metadata.downloadURL];
             [self updateMessageImageUrlToFB:url];
         }
     }];
--(void)uploadPhotoToFirebase:(NSData *)imageData{
-
-        FIRStorage *storage = [FIRStorage storage];
-        FIRStorageReference *storageRef = [storage referenceForURL:@"gs://wire-e0cde.appspot.com"];
-        FIRStorageReference *imageRef = [storageRef child:@"images/car4.jpg"];
-        FIRStorageUploadTask *uploadTask = [imageRef putData:imageData metadata:nil completion:^(FIRStorageMetadata *metadata, NSError *error){
-            if(error){
-            }
-    
-            else{
-                NSURL *downloadURL = metadata.downloadURL;
-                NSString *photoTimeStamp = [self createFormattedTimeStamp];
-            }
-        }];
     [uploadTask resume];
 }
-
-
 
 -(void)updateMessageImageUrlToFB: (NSString *)url {
     FIRDatabaseReference *firebaseRef = [[FIRDatabase database] reference];
@@ -472,13 +449,7 @@ NSData *localfile;
 
 
 #pragma mark Timestamp and Date Formatter Methods
--(NSString *)createFormattedTimeStamp {
-    NSDate *timestamp = [NSDate date];
-    NSLog(@"TIMESTAMP ##############= %@", timestamp);
-    NSString *stringTimestamp = [NSString stringWithFormat:@"%@", [NSDate date]];
-    NSLog(@"STRINGTIMESTAMP################= %@", stringTimestamp);
-    return stringTimestamp;
-}
+
 
 
 @end
